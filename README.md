@@ -26,6 +26,7 @@ Core:<br />
 ・Mybatis 3.4.1<br />
 ・Vue 2.6.10<br />
 ・moment 2.29.1<br />
+・ PostgreSQL v17<br />
 <br />
 Component:<br />
 ・ChartJs 2.9.3<br />
