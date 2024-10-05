@@ -1,6 +1,6 @@
 # POS SYSTEM BY Springboot & VUE
 
-Springboot X VUE
+Springboot X VUE For PostgreSQL
 <div>
 
 <div>
