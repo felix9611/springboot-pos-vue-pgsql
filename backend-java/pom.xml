@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.fixedasset</groupId>
-    <artifactId>pos-vue</artifactId>
+    <artifactId>pos-vue-pg</artifactId>
     <!--<version>1.0-SNAPSHOT</version>-->
     <name>vueadmin-java</name>
     <description>Demo project for Spring Boot</description>
