@@ -111,7 +111,7 @@
     </el-pagination>
 
     <el-dialog
-      title="QR Code Tag"
+      title="View Photos"
       :visible.sync="photoViewerDialog"
       width="600px"
       :before-close="closePhotoViewerDialog">
