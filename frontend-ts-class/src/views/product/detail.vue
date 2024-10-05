@@ -6,6 +6,20 @@
         <el-button icon="el-icon-circle-plus" circle v-if="readonlyMode === true" @click="startEdit()"></el-button>
       </div>
     </div>
+    <div class="p-[1rem] grid lg:grid-cols-3 gap-6" v-if="editForm.productListFiles && editForm.productListFiles.length > 0">
+      <div v-for="file in editForm.productListFiles" :key="file.id">
+        <div class="p-6 border border-2 rounded-xl">
+          <img :src="file.base64" />
+          <div class="py-1">
+            {{ file.fileName }}
+            <el-button
+              size="mini"
+              type="danger"
+              @click="delItemFile(file.id, editForm)">Delete</el-button>
+          </div>
+        </div>
+      </div>
+    </div>
     <el-form :model="editForm" :disabled="readonlyMode" class="grid lg:grid-cols-4 gap-3 px-6">
       <el-form-item class="lg:col-span-full">
           <el-upload
@@ -151,8 +165,8 @@ export default class ProductListDetail extends Vue {
   imgToBase64() {
     this.fileList.map(async (file: any) => {
       const response: any = await uploadImgToBase64(file.raw)
-      const dataBase64: string = response.data
-      this.fileBase64Data.push({ fileName: file.name, dataBase64 })
+      const base64: string = response.data
+      this.fileBase64Data.push({ fileName: file.name, base64 })
       // const test = response as never
     })
   }
@@ -184,51 +198,27 @@ export default class ProductListDetail extends Vue {
      //   refs.validate((valid: any) => {
        //     if (valid) {
                 console.log(this.fileBase64Data[0])
-                axios.post('/product/' + (this.editForm.id ? 'update' : 'create'), this.editForm)
-                    .then((res: any) => {
-                        if (this.fileBase64Data[0]) {
-                            const productCode = this.editForm.id ? this.editForm.productCode : res.data.data.productCode
-                            axios.post('/product/findByCode', { productCode }).then(
-                                ((res: any) => {
-                                    const  productId = res.data.data.id
-                                    this.fileBase64Data.forEach( (dataFile: any) => {
-                                        console.log(dataFile)
-                                        const { fileName, dataBase64 } = dataFile
-                                        axios.post(
-                                            '/product/file/upload',
-                                            { productId, fileName, base64: dataBase64 }
-                                        ).then(
-                                            res=> {
-                                                this.$notify({
-                                                    title: '',
-                                                    showClose: true,
-                                                    message: 'Success to save',
-                                                    type: 'success',
-                                                })
 
-                                                this.fileList = []
-                                                this.fileBase64Data = []
-                                                this.back()
-                                            })
-                                        })
-                                    })
-                                )
-                            } else {
-                                this.$notify({
-                                    title: '',
-                                    showClose: true,
-                                    message: 'Success to save',
-                                    type: 'success',
-                                })
-                                this.back()
-                            }
+                const finalForm = {
+                  ...this.editForm,
+                  newProductListFiles: this.fileBase64Data,
+                  tax: this.editForm.tax ? 1 : 0
+                }
+                axios.post('/product/' + (this.editForm.id ? 'update' : 'create'), finalForm)
+                    .then((res: any) => {
+                        this.$notify({
+                          title: '',
+                          showClose: true,
+                          message: 'Success to save',
+                          type: 'success',
+                        })
+                        this.back()
                 })
      //       } else {
                 return false;
      //  //     }
        // })
   }
-
   back() {
     this.$router.push({ path: '/product/product' })
   }
@@ -266,6 +256,19 @@ export default class ProductListDetail extends Vue {
 
     this.editForm.taxAmount = (val * this.editForm.taxRate).toFixed(2)
     this.editForm.afterTax = (val + ( val * this.editForm.taxRate)).toFixed(2)
+  }
+
+  delItemFile(id: number, productId: number) {
+    axios.delete(`/product/file/void/${id}`).then(res => {
+           
+      this.$notify({
+        title: '',
+        showClose: true,
+        message: 'Delete file success',
+        type: 'success'
+      })
+      this.editHandle()
+    })
   }
 }
 </script>

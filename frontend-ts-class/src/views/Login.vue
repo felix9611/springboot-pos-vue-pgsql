@@ -1,8 +1,7 @@
 <template>
     <div class="flex w-full h-screen bg-[url('assets/img/background3.jpg')]">
          <div class="m-auto bg-white w-[400px] p-6 rounded-xl">
-            <el-form ref="loginForm" :model="loginForm" :rules="loginRules" label-position="left" label-width="0px"
-                    class="login-form">
+            <el-form ref="loginForm" :model="loginForm" :rules="loginRules" label-position="left" label-width="0px">
                     <div class="text-center text-[1.3rem] p-3 font-black">Fixed Asset</div>
                 <el-form-item prop="username">
                     <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="Username">

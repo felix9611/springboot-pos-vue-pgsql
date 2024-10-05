@@ -36,7 +36,7 @@ public class ProductListController extends BaseController{
 
     @GetMapping("/{id}")
     public Result getOne(@PathVariable("id")Long id) {
-        return Result.succ(productListService.getById(id));
+        return Result.succ(productListService.findOneById(id));
     }
 
     @PostMapping("/findByCode")

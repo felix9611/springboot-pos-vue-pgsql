@@ -15,4 +15,5 @@ public interface ProductListService extends IService<ProductList> {
     ProductList findOne(ProductList productList);
     Page<ProductListDto> newPage(Page page, LambdaQueryWrapper<ProductList> queryWrapper);
     List<ProductListDto> listAll(LambdaQueryWrapper<ProductList> queryWrapper);
+    ProductList findOneById(Long id);
 }
