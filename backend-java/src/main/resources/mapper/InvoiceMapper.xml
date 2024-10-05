@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fixedasset.mapper.InvoiceMapper">
+    <insert id="saveNew" parameterType="com.fixedasset.entity.Invoice" useGeneratedKeys="true" keyProperty="id"> <!--此處的id為實體類中對應的id-->
+        insert into invoice(number, member_id, discount, total_amount, location_id, void, created_at)
+            values
+                (#{number}, #{memberId}, #{discount}, #{totalAmount}, #{locationId}, #{voidNum}, #{createdAt})
+    </insert>
+</mapper>

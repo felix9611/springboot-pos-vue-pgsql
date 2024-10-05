@@ -1,0 +1,23 @@
+server:
+  port: 8570
+# DataSource Config
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pos-vue #?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Canada/Eastern&allowPublicKeyRetrieval=true
+    username: admin
+    password: LP2416jc3103
+#  security:
+#    user:
+#      name: user
+#      password: 111111
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**Mapper.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+waiterxiaoyy:
+  jwt:
+    header: Authorization
+    expire: 86400 #1 day
+    secret: ji8n3439n439n43ld9ne9343fdfer49h # 秘钥
+swagger:
+  enabled: true
