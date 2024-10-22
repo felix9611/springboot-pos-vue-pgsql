@@ -4,15 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fixedasset.entity.ActionRecord;
 import com.fixedasset.entity.Location;
-import com.fixedasset.mapper.ActionRecordMapper;
 import com.fixedasset.mapper.LocationMapper;
+import com.fixedasset.service.ActionRecordService;
 import com.fixedasset.service.LocationService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -21,48 +19,114 @@ public class LocationServiceImpl extends ServiceImpl<LocationMapper, Location> i
 
     @Resource LocationMapper locationMapper;
 
-    @Resource ActionRecordMapper actionRecordMapper;
-
-    @Resource private ActionRecord actionRecord;
+    @Resource private ActionRecordService actionRecordService;
 
     public List<Location> getAll() {
-        return locationMapper.getALL();
+        LambdaQueryWrapper<Location> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Location::getStatu, 1);
+        return locationMapper.selectList(queryWrapper);
+    }
+
+    public void batchImport(List<Location> locations) {
+        for (Location location : locations) {
+            this.createNew(location);
+        }
     }
 
     public void createNew(Location location) {
-        actionRecord.setActionName("Save");
-        actionRecord.setActionMethod("POST");
-        actionRecord.setActionFrom("Location Manger");
-        actionRecord.setActionData(location.toString());
-        actionRecord.setActionSuccess("Success");
-        actionRecord.setCreated(OffsetDateTime.now());
-        this.createdAction(actionRecord);
+        LambdaQueryWrapper<Location> queryWrapper = Wrappers.lambdaQuery();
+        if(!StringUtils.isBlank(location.getPlaceCode())) {
+            queryWrapper.eq(Location::getPlaceCode, location.getPlaceCode());
+        }
+        if(!StringUtils.isBlank(location.getPlaceName())) {
+            queryWrapper.eq(Location::getPlaceName, location.getPlaceName());
+        }
+        queryWrapper.eq(Location::getStatu, 1);
+        Location checkOne = locationMapper.selectOne(queryWrapper);
+        if (checkOne == null) {
+            location.setCreated(OffsetDateTime.now());
+            location.setStatu(1);
+            locationMapper.insert(location);
 
-        locationMapper.insert(location);
+            actionRecordService.createdAction(
+                "Save", 
+                "POST", 
+                "Location Manger", 
+                location.toString(), 
+                "Success"
+            );
+        }  else {
+
+            actionRecordService.createdAction(
+                "Save", 
+                "POST", 
+                "Location Manger", 
+                location.toString(), 
+                "Failure"
+            );
+
+            throw new RuntimeException("Exist in records! Please check again!");
+        }
     }
 
     public void update(Location location) {
-        actionRecord.setActionName("Update");
-        actionRecord.setActionMethod("POST");
-        actionRecord.setActionFrom("Location Manger");
-        actionRecord.setActionData(location.toString());
-        actionRecord.setActionSuccess("Success");
-        actionRecord.setCreated(OffsetDateTime.now());
-        this.createdAction(actionRecord);
+        LambdaQueryWrapper<Location> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Location::getId, location.getId());
+        queryWrapper.eq(Location::getStatu, 1);
+        Location checkOne = locationMapper.selectOne(queryWrapper);
 
-        locationMapper.updateById(location);
+        if (checkOne.getId().equals(location.getId())) {
+            location.setUpdated(OffsetDateTime.now());
+            locationMapper.updateById(location);
+
+            actionRecordService.createdAction(
+                "Update", 
+                "POST", 
+                "Location Manger", 
+                location.toString(), 
+                "Success"
+            );
+        } else {
+
+            actionRecordService.createdAction(
+                "Update", 
+                "POST", 
+                "Location Manger", 
+                location.toString(), 
+                "Failure"
+            );
+
+            throw new RuntimeException("No active data in records!");
+        }
     }
 
     public void remove(Location location) {
-        actionRecord.setActionName("Remove");
-        actionRecord.setActionMethod("DELETE");
-        actionRecord.setActionFrom("Location Manger");
-        actionRecord.setActionData(location.toString());
-        actionRecord.setActionSuccess("Success");
-        actionRecord.setCreated(OffsetDateTime.now());
-        this.createdAction(actionRecord);
+        LambdaQueryWrapper<Location> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Location::getId, location.getId());
+        queryWrapper.eq(Location::getStatu, 1);
+        Location checkOne = locationMapper.selectOne(queryWrapper);
+        if (checkOne.getId().equals(location.getId())) {
 
-        locationMapper.updateById(location);
+            locationMapper.updateById(location);
+
+            actionRecordService.createdAction(
+                "Remove", 
+                "DELETE", 
+                "Location Manger", 
+                location.toString(), 
+                "Success"
+            );
+        } else {
+            actionRecordService.createdAction(
+                "Remove", 
+                "DELETE", 
+                "Location Manger", 
+                location.toString(), 
+                "Failure"
+            );
+
+            throw new RuntimeException("No active data in records!");
+        }
     }
 
     public Location getData(Location location) {
@@ -76,8 +140,5 @@ public class LocationServiceImpl extends ServiceImpl<LocationMapper, Location> i
         queryWrapper.eq(Location::getStatu, 1);
         return locationMapper.selectOne(queryWrapper);
     }
-
-    public int createdAction(ActionRecord actionRecord) {
-        return actionRecordMapper.insert(actionRecord);
-    }
 }
+

@@ -28,4 +28,8 @@ public interface MemberService extends IService<Member> {
     Page<MemberSpecialDay> listSpecialDayPage(Page page, LambdaQueryWrapper<MemberSpecialDay> queryWrapper);
 
     MemberSpecialDay getOne(Long id);
+
+    Member getOneMember(Long id);
+
+    void importData(List<Member> members);
 }

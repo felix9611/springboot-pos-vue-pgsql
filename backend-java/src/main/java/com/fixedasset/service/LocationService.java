@@ -15,4 +15,7 @@ public interface LocationService extends IService<Location> {
     List<Location> getAll();
 
     Location getData(Location location);
+
+    void batchImport(List<Location> locations);
 }
+
