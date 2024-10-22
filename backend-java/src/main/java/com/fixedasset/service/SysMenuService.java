@@ -11,4 +11,11 @@ public interface SysMenuService extends IService<SysMenu> {
     List<SysMenuDto> getCurrentUserNav();
 
     List<SysMenu> tree();
+
+    void createOneMeun(SysMenu menu);
+
+    void updateOne(SysMenu menu);
+
+    void voidOne(Long id);
 }
+

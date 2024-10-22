@@ -10,6 +10,7 @@ import com.fixedasset.entity.SysMenu;
 import com.fixedasset.entity.SysUser;
 import com.fixedasset.mapper.SysMenuMapper;
 import com.fixedasset.mapper.SysUserMapper;
+import com.fixedasset.service.ActionRecordService;
 import com.fixedasset.service.SysMenuService;
 import com.fixedasset.service.SysUserService;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,18 +20,20 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
+import java.time.OffsetDateTime;
 
 @Service
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements SysMenuService {
 
-    @Resource
-    SysUserService sysUserService;
+    @Resource private SysUserService sysUserService;
 
-    @Resource
-    SysUserMapper sysUserMapper;
+    @Resource private SysUserMapper sysUserMapper;
+
+    @Resource private SysMenuMapper sysMenuMapper;
 
     @Resource private SysMenu sysMenu;
+
+    @Resource private ActionRecordService actionRecordService;
 
     @Override
     public List<SysMenuDto> getCurrentUserNav() {
@@ -45,7 +48,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         queryWrapper.eq(SysMenu::getStatu, 1);
         List<SysMenu> menuList = this.list(queryWrapper);
 
-        // 只留下导航菜单，去除按钮级别的菜单权限
+        // Remove button lv
         Iterator<SysMenu> iterator = menuList.iterator();
         while(iterator.hasNext()) {
             SysMenu sysMenu = iterator.next();
@@ -54,10 +57,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             }
         }
 
-        // 转树状结构
+        // Convert to tree structure JSON
         List<SysMenu> menuTree = buildTreeMenu(menuList);
 
-        // 实体转dto
+        // convert under dto
 
 
         return convert(menuTree);
@@ -65,10 +68,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
     @Override
     public List<SysMenu> tree() {
-        // 获取所有菜单信息
-        List<SysMenu> sysMenus = this.list(new QueryWrapper<SysMenu>().orderByAsc("order_num").eq("statu", 1));
+        // Get all
+        List<SysMenu> sysMenus = this.list(new QueryWrapper<SysMenu>().orderByAsc("orderNum").eq("statu", 1));
 
-        // 转成树状结构
+        // Convert to tree structure JSON
         return buildTreeMenu(sysMenus);
     }
 
@@ -89,7 +92,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
             if (m.getChildren().size() > 0) {
 
-                // 子节点调用当前方法进行再次转换
+                // The child node calls the current method to convert again
                 dto.setChildren(convert(m.getChildren()));
             }
 
@@ -103,7 +106,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
         List<SysMenu> finalMenus = new ArrayList<>();
 
-        // 先各自寻找到各自的孩子
+        // Find child
         for (SysMenu menu : menus) {
 
             for (SysMenu e : menus) {
@@ -114,7 +117,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
             }
 
-            // 提取出父节点
+            // Put Parent Id
             if (menu.getParentId() == 0L) {
                 finalMenus.add(menu);
             }
@@ -122,5 +125,97 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
         System.out.println(JSONUtil.toJsonStr(finalMenus));
         return finalMenus;
+    }
+
+    public void createOneMeun(SysMenu sysMenu) {
+        LambdaQueryWrapper<SysMenu> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(SysMenu::getName, sysMenu.getName());
+        queryWrapper.eq(SysMenu::getPath, sysMenu.getPath());
+        queryWrapper.eq(SysMenu::getStatu, 1);
+        SysMenu checkOne = this.getOne(queryWrapper);
+
+        if (checkOne == null) {
+            sysMenu.setCreated(OffsetDateTime.now());
+            sysMenu.setStatu(1);
+
+            sysMenuMapper.insert(sysMenu);
+
+            actionRecordService.createdAction(
+                "Create", 
+                "POST", 
+                "System Menu Manager", 
+                sysMenu.toString(), 
+                "Success"
+            );
+            
+        } else {
+            actionRecordService.createdAction(
+                "Create", 
+                "POST", 
+                "System Menu Manager", 
+                sysMenu.toString(), 
+                "Failure"
+            );
+            throw new RuntimeException("Exist in lists! Please check again!");
+        }
+    }
+
+    public void updateOne(SysMenu sysMenu) {
+        LambdaQueryWrapper<SysMenu> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(SysMenu::getId, sysMenu.getId());
+        queryWrapper.eq(SysMenu::getStatu, 1);
+        SysMenu checkOne = this.getOne(queryWrapper);
+
+        if (checkOne.getId().equals(sysMenu.getId())) {
+            sysMenu.setUpdated(OffsetDateTime.now());
+            sysMenuMapper.updateById(sysMenu);
+
+            actionRecordService.createdAction(
+                "Update", 
+                "POST", 
+                "System Menu Manager", 
+                sysMenu.toString(), 
+                "Success"
+            );
+        } else {
+            actionRecordService.createdAction(
+                "Update", 
+                "POST", 
+                "System Menu Manager", 
+                sysMenu.toString(), 
+                "Failure"
+            );
+            throw new RuntimeException("Not active data in records!");
+        }  
+    }
+
+    public void voidOne(Long id) {
+        LambdaQueryWrapper<SysMenu> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(SysMenu::getId, id);
+        queryWrapper.eq(SysMenu::getStatu, 1);
+        SysMenu checkOne = this.getOne(queryWrapper);
+
+        if (checkOne.getId().equals(id)) {
+            sysMenu.setUpdated(OffsetDateTime.now());
+            sysMenu.setStatu(0);
+            sysMenuMapper.updateById(sysMenu);
+
+            actionRecordService.createdAction(
+                "Void", 
+                "DELETE", 
+                "System Menu Manager", 
+                sysMenu.toString(), 
+                "Success"
+            );
+        } else {
+            actionRecordService.createdAction(
+                "Void", 
+                "DELETE", 
+                "System Menu Manager", 
+                sysMenu.toString(), 
+                "Failure"
+            );
+            throw new RuntimeException("Not active data in records!");
+        }  
     }
 }

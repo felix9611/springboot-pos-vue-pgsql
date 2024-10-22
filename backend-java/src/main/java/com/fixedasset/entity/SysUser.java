@@ -1,6 +1,8 @@
 package com.fixedasset.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,50 +13,50 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * <p>
- * 
- * </p>
- *
- * @author WaiterXiaoYY
- * @since 2022-01-13
- */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SysUser extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @NotBlank(message = "Username Cannot Blank")
+    @Schema(description = "Username")
+    @NotBlank(message = "Username cannot be empty")
     private String username;
 
+    @Schema(description = "Passeord, use BCrypt encoder")
     private String password;
 
+    @Schema(description = "Avatar URL, Useless")
     private String avatar;
 
+    @Schema(description = "Department ID")
     @TableField("dept_id")
     private int deptId;
 
-    @TableField("place_id")
-    private int placeId;
-
+    @Schema(description = "Avatar image base64 code")
     @TableField("avatar_base64")
     private String avatarBase64;
 
-    @NotBlank(message = "Email Cannot Blank")
-    @Email(message = "Email Format Incorrect")
+    @Schema(description = "Email address")
+    @NotBlank(message = "Email cannot be empty")
+    @Email(message = "Email format is incorrect")
     private String email;
 
+    @Schema(description = "City Code")
     private String city;
 
+    @Schema(description = "Last Login")
     private OffsetDateTime lastLogin;
 
+    @Schema(description = "System Role lists,Only apply for response")
     @TableField(exist = false)
     private List<SysRole> sysRoles = new ArrayList<>();
 
+    @Schema(description = "Only apply for paging in list api")
     @TableField(exist = false)
     private int page;
 
+    @Schema(description = "Only apply for paging in list api")
     @TableField(exist = false)
     private int limit;
 
