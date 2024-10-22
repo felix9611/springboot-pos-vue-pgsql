@@ -1,10 +1,13 @@
 package com.fixedasset.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fixedasset.entity.ActionRecord;
 import com.fixedasset.entity.CodeType;
 import com.fixedasset.mapper.ActionRecordMapper;
 import com.fixedasset.mapper.CodeTypeMapper;
+import com.fixedasset.service.ActionRecordService;
 import com.fixedasset.service.CodeTypeService;
 import org.springframework.stereotype.Service;
 
@@ -19,57 +22,117 @@ public class CodeTypeServiceImpl extends ServiceImpl<CodeTypeMapper, CodeType> i
 
     @Resource private ActionRecord actionRecord;
 
+    @Resource private ActionRecordService actionRecordService;
+
     @Resource private CodeTypeMapper codeTypeMapper;
 
     @Resource private CodeType codeType;
 
     public List<CodeType> getAllList(CodeType codeType) {
-        return codeTypeMapper.getALL(codeType.getType());
+        LambdaQueryWrapper<CodeType> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(CodeType::getStatu, 1);
+        queryWrapper.eq(CodeType::getType, codeType.getType());
+        return codeTypeMapper.selectList(queryWrapper);
+    }
+
+    public void batchImport(List<CodeType> codeTypes) {
+        for (CodeType codeType : codeTypes) {
+            this.createOne(codeType);
+        }
     }
 
     public void createOne(CodeType codeType) {
-        codeType.setStatu(1);
-        codeType.setCreated(OffsetDateTime.now());
-        codeTypeMapper.insert(codeType);
+        LambdaQueryWrapper<CodeType> queryWrapper = Wrappers.lambdaQuery();
 
-        actionRecord.setActionName("Save");
-        actionRecord.setActionMethod("POST");
-        actionRecord.setActionFrom("Code Type Manger");
-        actionRecord.setActionData(codeType.toString());
-        actionRecord.setActionSuccess("Success");
-        actionRecord.setCreated(OffsetDateTime.now());
-        this.createdAction(actionRecord);
+        if (!codeType.getValueCode().isEmpty()) {
+            queryWrapper.eq(CodeType::getValueCode, codeType.getValueCode());
+        }
+        if (!codeType.getType().isEmpty()) {
+            queryWrapper.eq(CodeType::getType, codeType.getType());
+        }
+        queryWrapper.eq(CodeType::getStatu, 1);
+        CodeType checkOne = codeTypeMapper.selectOne(queryWrapper);
+        if (checkOne == null) {
+            codeType.setStatu(1);
+            codeType.setCreated(OffsetDateTime.now());
+            codeTypeMapper.insert(codeType);
+
+            actionRecordService.createdAction(
+                "Save", 
+                "POST", 
+                "Code Type Manger", 
+                codeType.toString(), 
+                "Success"
+            );
+
+        } else {
+            actionRecordService.createdAction(
+                "Save", 
+                "POST", 
+                "Code Type Manger", 
+                codeType.toString(), 
+                "Failure"
+            );
+            throw new RuntimeException("Exist in records! Please check again!");
+        }
     }
 
     public void updateOne(CodeType codeType) {
-        codeType.setUpdated(OffsetDateTime.now());
-        codeTypeMapper.updateById(codeType);
+        LambdaQueryWrapper<CodeType> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(CodeType::getStatu, 1);
+        queryWrapper.eq(CodeType::getId, codeType.getId());
+        CodeType checkOne = codeTypeMapper.selectOne(queryWrapper);
+        if (checkOne.getId().equals(codeType.getId())) {
+            codeType.setUpdated(OffsetDateTime.now());
+            codeTypeMapper.updateById(codeType);
 
-        actionRecord.setActionName("Update");
-        actionRecord.setActionMethod("POST");
-        actionRecord.setActionFrom("Code Type Manger");
-        actionRecord.setActionData(codeType.toString());
-        actionRecord.setActionSuccess("Success");
-        actionRecord.setCreated(OffsetDateTime.now());
-        this.createdAction(actionRecord);
-
+            actionRecordService.createdAction(
+                "Update", 
+                "POST", 
+                "Code Type Manger", 
+                codeType.toString(), 
+                "Success"
+            );
+        } else {
+            actionRecordService.createdAction(
+                "Update", 
+                "POST", 
+                "Code Type Manger", 
+                codeType.toString(), 
+                "Failure"
+            );
+            throw new RuntimeException("Not active data in records!");
+        }
     }
 
     public void remove(Long id) {
-        codeType.setId(id);
-        codeType.setStatu(0);
-        codeTypeMapper.updateById(codeType);
+        LambdaQueryWrapper<CodeType> queryWrapper = Wrappers.lambdaQuery();
 
-        actionRecord.setActionName("Remove");
-        actionRecord.setActionMethod("Delete");
-        actionRecord.setActionFrom("Code Type Manger");
-        actionRecord.setActionData(codeType.toString());
-        actionRecord.setActionSuccess("Success");
-        actionRecord.setCreated(OffsetDateTime.now());
-        this.createdAction(actionRecord);
-    }
+        queryWrapper.eq(CodeType::getId, id);
+        queryWrapper.eq(CodeType::getStatu, 1);
+        CodeType checkOne = codeTypeMapper.selectOne(queryWrapper);
+        if (checkOne.getId().equals(id)) {
+            codeType.setId(id);
+            codeType.setStatu(0);
+            codeType.setUpdated(OffsetDateTime.now());
+            codeTypeMapper.updateById(codeType);
 
-    public int createdAction(ActionRecord actionRecord) {
-        return actionRecordMapper.insert(actionRecord);
+            actionRecordService.createdAction(
+                "Remove", 
+                "Delete", 
+                "Code Type Manger", 
+                codeType.toString(), 
+                "Success"
+            );
+        } else {
+            actionRecordService.createdAction(
+                "Remove", 
+                "Delete", 
+                "Code Type Manger", 
+                codeType.toString(), 
+                "Failure"
+            );
+            throw new RuntimeException("Not active data in records!");
+        }   
     }
 }
