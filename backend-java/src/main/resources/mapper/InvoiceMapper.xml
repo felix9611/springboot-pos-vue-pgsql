@@ -9,24 +9,24 @@
 
     <select id="queryCountYearWeek" resultType="com.fixedasset.dto.charts.QueryCountYearWeek">
         SELECT 
-            concat(year(created_at), '-', week(created_at)) as yearWeek, 
+            CONCAT(date_part('YEAR', created_at), '-', date_part('MONTH', created_at)) as yearWeek, 
             count(*) as count 
         FROM invoice ${ew.customSqlSegment}  
-        GROUP BY concat(year(created_at), '-', week(created_at)) ;
+        GROUP BY CONCAT(date_part('YEAR', created_at), '-', date_part('MONTH', created_at)) ;
     </select>
 
     <select id="queryCountShop" resultType="com.fixedasset.dto.charts.QueryCountShop">
         SELECT loc.place_name as placeName,  count(inv.id) as count 
         FROM invoice as inv 
         LEFT JOIN location as loc on inv.location_id = loc.id and loc.place_name is not null 
-        GROUP BY location_id;
+        GROUP BY loc.place_name;
     </select>
 
     <select id="queryTotalShop" resultType="com.fixedasset.dto.charts.QueryTotalShop">
         SELECT loc.place_name as placeName, sum(total_amount) as total 
         FROM invoice as inv 
         LEFT JOIN location as loc on inv.location_id = loc.id 
-        GROUP BY  location_id;
+        GROUP BY loc.place_name;
     </select>
 
     <select id="listSalesByProduct" resultType="com.fixedasset.dto.charts.InvoiceSalesDataResult">
@@ -107,19 +107,19 @@
         LIMIT 10;
     </select>
 
-    <select id="totalSalesByDept" resultType="com.fixedasset.dto.charts.InvoiceSalesDataResult">
-       SELECT 
-            dept.dept_name as deptName,
-            SUM(ii.price) as totalPrice  
-        FROM invoice as invoice
-        LEFT JOIN invoice_item as ii on invoice.id  = ii.invoice_id
-        LEFT JOIN product_list as prod on ii.product_id = prod.id
-        LEFT JOIN department as dept on prod.dept_id = dept.id
-        ${ew.customSqlSegment} 
-            AND ii.price IS NOT NULL 
-            AND prod.dept_id IS NOT NULL
-        GROUP BY dept.dept_name  
-        ORDER BY sum(ii.qty) DESC
-        LIMIT 10;
+    <select id="listAll" resultType="com.fixedasset.dto.InvoiceListDto">
+       SELECT * from (
+        SELECT inv.*, 
+            m.name as memberName, m.phone as memberPhone, m.address as memberAddress, 
+            mc.name as mcName , loc.place_code as placeCode, loc.place_name as placeName,
+            loc.address as address, loc.zip_code as zipCode, loc.country as country
+             FROM invoice as inv 
+            LEFT JOIN member as m on inv.member_id = m.id 
+            LEFT JOIN member_class as mc on m.class  = mc.id 
+            LEFT JOIN location as loc on inv.location_id = loc.id
+       ) AS q ${ew.customSqlSegment}
     </select>
+    
+
+
 </mapper>
