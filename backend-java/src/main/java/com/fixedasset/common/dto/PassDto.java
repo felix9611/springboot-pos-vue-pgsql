@@ -3,14 +3,19 @@ package com.fixedasset.common.dto;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.io.Serializable;
 
 @Data
 public class PassDto implements Serializable {
 
-	@NotBlank(message = "New Password cannot blank")
+	@Schema(description = "New Password")
+	@NotBlank(message = "New Password cannot be empty")
 	private String password;
 
-	@NotBlank(message = "Old Password cannot blank")
+	@Schema(description = "Old Password")
+	@NotBlank(message = "OLD Password cannot be empty")
 	private String currentPass;
 }

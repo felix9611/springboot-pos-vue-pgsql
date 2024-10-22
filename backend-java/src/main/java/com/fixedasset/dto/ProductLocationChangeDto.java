@@ -1,22 +1,36 @@
 package com.fixedasset.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
 public class ProductLocationChangeDto {
+    @Schema(description = "The product data id")
     private int productId;
+
+    @Schema(description = "New location id")
     private int newPlace;
+
+    @Schema(description = "Old location id")
     private int oldPlace;
+
+    @Schema(description = "Old Location Qtys")
     private int qty;
+
+    @Schema(description = "New Location Qtys")
     private int newPlaceQty;
-    private int cost;
+
+    @Schema(description = "Costs")
+    private double cost;
+
+    @Schema(description = "Other Qtys")
     private int otherQty;
 
     public int getOtherQty() {
         return otherQty;
     }
 
-    public int getCost() {
+    public double getCost() {
         return cost;
     }
 
