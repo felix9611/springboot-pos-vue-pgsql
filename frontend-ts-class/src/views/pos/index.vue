@@ -172,7 +172,7 @@
           </div>
 
           <el-form-item label="Total"  prop="total" label-width="130px">
-            <el-input-number v-model="totalCalForm.totalCal" readonly></el-input-number>
+            <el-input-number v-model="totalCalForm.totalPriceAll" readonly></el-input-number>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="cancelPO()">Cancel</el-button>
@@ -369,6 +369,8 @@ export default class POSpage extends Vue {
     )
   }
 
+  newInvoiceItems: any = []
+
   submitPreSell() {
     console.log(this.productDetail.taxAmount, 'firest')
     const preSellThing = {
@@ -378,14 +380,26 @@ export default class POSpage extends Vue {
       discount: this.productDetail.discount,
       totalPrice: Number(this.productDetail.totalPriceAll),
       description: this.productDetail.description,
-      id: this.productDetail.id,
+      productId: this.productDetail.id,
       discountType: this.productDetail.discountType,
       placeId: this.placeId,
       afterTax: Number(this.productDetail.totalPriceAll),
-      taxAmount: Number(this.productDetail.taxAmount),
+      taxAmount: Number(this.productDetail.taxAmount) * this.productDetail.qty,
       taxCode: this.productDetail.taxCode
     }
 
+    const newInvoiceItem = {
+      productId: this.productDetail.id,
+      qty: this.productDetail.qty,
+      discount: this.productDetail.discount,
+      price: Number(this.productDetail.totalPriceAll),
+      discountType: this.productDetail.discountType,
+      taxRate: this.productDetail.taxRate,
+      taxCode: this.productDetail.taxCode,
+      taxAmount: Number(this.productDetail.taxAmount)
+    }
+
+    this.newInvoiceItems.push(newInvoiceItem )
     this.preSellList.push(preSellThing)
     this.productDetail = {}
 
@@ -495,6 +509,8 @@ export default class POSpage extends Vue {
     this.payFormMethod = {}
   }
 
+  
+
   submitMemberPayment() {
     const main = {
       totalAmount: this.payForm.totalPrice,
@@ -502,78 +518,16 @@ export default class POSpage extends Vue {
       locationId: this.placeId,
       discount: this.totalCalForm.discount,
       discountType: this.totalCalForm.discountType,
-      taxTotal: this.totalCalForm.taxTotal
+      taxTotal: this.totalCalForm.taxTotal,
+      newPaymentItems: this.payList,
+      newInvoiceItems: this.newInvoiceItems
     }
 
     console.log(main)
 
     axios.post('/invoice/save', main).then(
        (res: any) => {
-         const invoiceCode = res.data.data.number
-
-         setTimeout(
-          () =>{
-            axios.get(`/invoice/${invoiceCode}`).then(
-            (rn: any) => {
-              const invoiceId = res.data.data.id
-              this.preSellList.forEach((rn: any, i: any) => {
-
-                setTimeout(
-                  () =>{
-                    const invoiceItem = {
-                      invoiceId,
-                      productId: rn.id,
-                      qty: rn.qty,
-                      price: rn.totalPrice,
-                      discountType: rn.discountType,
-                      discount: rn.discount,
-                      taxCode: rn.taxCode,
-                      taxRate: rn.taxRate,
-                      taxAmount: rn.taxAmount
-                    }
-                    axios.post('/invoice/saveItem', invoiceItem)
-
-                    setTimeout(
-                      function(){
-                        axios.post('/product/location/find', { 
-                          productId: rn.id,
-                          locationId: rn.placeId
-                        }).then(
-                          (rc: any) => {
-                            const oldData = rc.data.data
-                            if (rn.qty > oldData.qty) {
-                              
-                            } else {
-                                const renewQty = oldData.qty - rn.qty
-                                console.log(renewQty)
-                                axios.post('/product/location/stock/out', {
-                                  productId: rn.id,
-                                  oldPlace: rn.placeId,
-                                  locationId: rn.placeId,
-                                  qty: renewQty,
-                                  otherQty: rn.qty
-                                })
-
-                                
-                            }
-                          }
-                        )
-                      },2000 * i)
-                }, 2000 * i)
-                this.payList.forEach((rn: any) => {
-                        const payItem = {
-                          invoiceId,
-                          method: rn.method,
-                          amount: rn.amount
-                        }
-
-                        axios.post('/payment/save', payItem)
-                      })
-                this.detailHandle(invoiceId) 
-              })
-
-            })
-        }, 2000)
+        this.$router.push(`/invoice/detail/${res.data.data.id}`)   
     })       
   }
 

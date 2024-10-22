@@ -56,6 +56,11 @@
             prop="qty"
             label="Qty">
           </el-table-column>
+          <el-table-column
+            sortable
+            prop="cost"
+            label="Cost">
+          </el-table-column>
         </el-table>
         <br>
         <br>
@@ -101,8 +106,16 @@ export default class StockIn extends Vue {
       (res: any) => {
         this.stockInForm.productName = res.data.data.productName
         this.stockInForm.productId = res.data.data.id
+        this.stockInForm.cost = res.data.data.retailPrice
       }
     )
+  }
+
+  @Watch('stockInForm.qty', { immediate: true, deep: true })
+  costChange() {
+    if (this.stockInForm.qty > 0) {
+      this.stockInForm.cost = this.stockInForm.qty * this.stockInForm.cost
+    }
   }
 
   @Watch('stockInForm.placeId', { immediate: true, deep: true })
@@ -141,7 +154,7 @@ export default class StockIn extends Vue {
                 productId: rs.productId,
                 locationId: rs.placeId,
                 qty: rs.qty,
-                cost: rs.cost
+                totalPrice: rs.cost
               }
             ).then(
               (res: any) => {}

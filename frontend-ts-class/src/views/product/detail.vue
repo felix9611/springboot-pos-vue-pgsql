@@ -36,7 +36,7 @@
       <el-form-item label="Product Code"  prop="productCode" label-width="120px">
         <el-input v-model="editForm.productCode" autocomplete="off" readonly></el-input>
       </el-form-item>
-      <el-form-item label="Product Name"  prop="productName" label-width="120px">
+      <el-form-item label="Product Name"  prop="productName" label-width="120px" class="lg:col-span-3">
         <el-input v-model="editForm.productName" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item label="Item Code"  prop="itemCode" label-width="120px">
@@ -201,8 +201,7 @@ export default class ProductListDetail extends Vue {
 
                 const finalForm = {
                   ...this.editForm,
-                  newProductListFiles: this.fileBase64Data,
-                  tax: this.editForm.tax ? 1 : 0
+                  newProductListFiles: this.fileBase64Data
                 }
                 axios.post('/product/' + (this.editForm.id ? 'update' : 'create'), finalForm)
                     .then((res: any) => {
@@ -219,6 +218,7 @@ export default class ProductListDetail extends Vue {
      //  //     }
        // })
   }
+
   back() {
     this.$router.push({ path: '/product/product' })
   }

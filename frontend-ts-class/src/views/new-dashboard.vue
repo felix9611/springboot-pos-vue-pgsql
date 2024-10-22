@@ -50,6 +50,54 @@
                 <ChartJs v-bind="chartsSetD" />
             </div>
         </div>
+        <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
+            <div class="font-bold p-1">
+                Top 10 Sell Total Price Per Product
+            </div>
+            <div class="p-1">
+                <ChartJs v-bind="chartsSetE" />
+            </div>
+        </div>
+        <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
+            <div class="font-bold p-1">
+                Top 10 Sell Qtys Per Product
+            </div>
+            <div class="p-1">
+                <ChartJs v-bind="chartsSetF" />
+            </div>
+        </div>
+        <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
+            <div class="font-bold p-1">
+                Top 10 Sell Total Price Per Product Type
+            </div>
+            <div class="p-1">
+                <ChartJs v-bind="chartsSetG" />
+            </div>
+        </div>
+        <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
+            <div class="font-bold p-1">
+                Top 10 Sell Qtys Per Product Type
+            </div>
+            <div class="p-1">
+                <ChartJs v-bind="chartsSetH" />
+            </div>
+        </div>
+        <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
+            <div class="font-bold p-1">
+                Top 10 Sell Total Price Per Department
+            </div>
+            <div class="p-1">
+                <ChartJs v-bind="chartsSetI" />
+            </div>
+        </div>
+        <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
+            <div class="font-bold p-1">
+                Top 10 Sell Qtys Per Department
+            </div>
+            <div class="p-1">
+                <ChartJs v-bind="chartsSetJ" />
+            </div>
+        </div>
     </div>
 </template>
 <script lang="ts">
@@ -76,6 +124,13 @@ export default class Dashboard extends Vue {
     queryCountYearWeekList: any = []
     queryTotalShopList: any = []
     queryCountShopList: any = []
+    querySalesByProductList: any = [] 
+    querySalesByProductCountList: any = [] 
+
+    queryTotalSalesByTypeList: any = [] 
+    queryCountSalesByTypeList: any = [] 
+    queryCountSalesByDeptList: any = [] 
+    queryTotalSalesByDeptList: any = [] 
 
     get chartsSetA() {
         return {
@@ -140,7 +195,85 @@ export default class Dashboard extends Vue {
             datasetKey: 'placeName',
             value: 'count',
             data: this.queryCountShopList,
-            label: 'Total Items',
+            label: 'Total Qtys',
+            colors: '#a1d41b'
+        }
+    }
+
+    get chartsSetE() {
+        return {
+            width: 1000,
+            heigh: 90,
+            type: 'bar',
+            datasetKey: 'productName',
+            value: 'totalPrice',
+            data: this.querySalesByProductList,
+            label: 'Total Price($)',
+            colors: '#a1d41b'
+        }
+    }
+
+    get chartsSetF() {
+        return {
+            width: 1000,
+            heigh: 90,
+            type: 'bar',
+            datasetKey: 'productName',
+            value: 'counts',
+            data: this.querySalesByProductCountList,
+            label: 'Total Qtys',
+            colors: '#a1d41b'
+        }
+    }
+
+    get chartsSetG() {
+        return {
+            width: 1000,
+            heigh: 90,
+            type: 'bar',
+            datasetKey: 'typeName',
+            value: 'totalPrice',
+            data: this.queryTotalSalesByTypeList,
+            label: 'Total Price($)',
+            colors: '#a1d41b'
+        }
+    }
+
+    get chartsSetH() {
+        return {
+            width: 1000,
+            heigh: 90,
+            type: 'bar',
+            datasetKey: 'typeName',
+            value: 'counts',
+            data: this.queryCountSalesByTypeList,
+            label: 'Total Qtys',
+            colors: '#a1d41b'
+        }
+    }
+
+    get chartsSetI() {
+        return {
+            width: 1000,
+            heigh: 90,
+            type: 'bar',
+            datasetKey: 'deptName',
+            value: 'counts',
+            data: this.queryCountSalesByDeptList,
+            label: 'Total Qtys',
+            colors: '#a1d41b'
+        }
+    }
+
+    get chartsSetJ() {
+        return {
+            width: 1000,
+            heigh: 90,
+            type: 'bar',
+            datasetKey: 'deptName',
+            value: 'totalPrice',
+            data: this.queryTotalSalesByDeptList,
+            label: 'Total Price($)',
             colors: '#a1d41b'
         }
     }
@@ -157,6 +290,12 @@ export default class Dashboard extends Vue {
         this.queryCountYearWeek()
         this.queryTotalShop()
         this.queryCountShop()
+        this.querySalesByProduct()
+        this.querySalesByProductCounts()
+        this.queryTotalSalesByType()
+        this.queryCountSalesByType()
+        this.queryCountSalesByDept()
+        this.queryTotalSalesByDept()
     }
 
     created() {
@@ -164,6 +303,62 @@ export default class Dashboard extends Vue {
         this.queryCountYearWeek()
         this.queryTotalShop()
         this.queryCountShop()
+        this.querySalesByProduct()
+        this.querySalesByProductCounts()
+
+        this.queryTotalSalesByType()
+        this.queryCountSalesByType()
+        this.queryCountSalesByDept()
+        this.queryTotalSalesByDept()
+    }
+
+    queryTotalSalesByDept() {
+        axios.post('/invoice/queryTotalSalesByDept', this.groupByFind).then(
+            (res: any) => {
+                this.queryTotalSalesByDeptList = res.data.data
+            }
+        )
+    }
+
+    queryCountSalesByDept() {
+        axios.post('/invoice/queryCountSalesByDept', this.groupByFind).then(
+            (res: any) => {
+                this.queryCountSalesByDeptList = res.data.data
+            }
+        )
+    }
+
+    queryCountSalesByType() {
+        axios.post('/invoice/queryCountSalesByType', this.groupByFind).then(
+            (res: any) => {
+                this.queryCountSalesByTypeList = res.data.data
+            }
+        )
+    }
+
+    queryTotalSalesByType() {
+        axios.post('/invoice/queryTotalSalesByType', this.groupByFind).then(
+            (res: any) => {
+                this.queryTotalSalesByTypeList = res.data.data
+            }
+        )
+    }
+
+    querySalesByProductCounts() {
+        axios.post('/invoice/querySalesByProductCounts', this.groupByFind).then(
+            (res: any) => {
+                console.log(res, 'querySalesByProductCounts')
+                this.querySalesByProductCountList = res.data.data
+            }
+        )
+    }
+
+    querySalesByProduct() {
+        axios.post('/invoice/querySalesByProduct', this.groupByFind).then(
+            (res: any) => {
+                this.querySalesByProductList = res.data.data
+            }
+        )
     }
 
     queryTotalYearWeek() {

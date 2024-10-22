@@ -1,12 +1,34 @@
 <template>
   <div class="container">
-    <div class="handle-box">
+    <div>
       <el-form :inline="true">
+        <el-form-item>
+          <el-input
+            v-model="searchForm.name"
+            placeholder="Phone"
+            clearable
+          >
+          </el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-input
+            v-model="searchForm.phone"
+            placeholder="Phone"
+            clearable
+          >
+          </el-input>
+        </el-form-item>
         <el-form-item>
           <el-button @click="memberAllList">Find</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="dialogVisible">Create</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="downloadTemplateExcel()">Download Template Excel</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="clickUploadDialog()">Upload Excel</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -110,7 +132,7 @@
         <el-table-column
           sortable
           prop="name"
-          label="Person Name">
+          label="Name">
         </el-table-column>
         <el-table-column
           sortable
@@ -159,12 +181,32 @@
       :total="total">
     </el-pagination>
     </el-dialog>
+
+    <el-dialog
+                title="Upload Excel"
+                :visible.sync="uploaderDialog"
+                width="700px"
+                :before-close="closerUploadDialog">
+                <el-upload
+                        class="upload-demo"
+                        :auto-upload="false"
+                        :file-list="fileList"
+                        :on-change="uploadFile"
+                        :on-remove="clearFile"
+                        >
+                        <el-button size="small" type="primary">Upload</el-button>
+                        <!--<div slot="tip" class="el-upload__tip">Only Excel</div>-->
+                    </el-upload>
+     </el-dialog>
   </div>
 </template>
 <script lang="ts">
 import axios from '@/axios'
 import { Component, Vue } from 'vue-property-decorator'
 import moment from 'moment'
+import { excelHeader, formatSpecialDate } from './excelHeader'
+import { formatJson, readExcel, saveJsonToExcel, downloadTempExcelFile } from '@/utils/importExcel'
+import { ElSwitch } from 'element-ui/types/switch'
 
 @Component
 export default class Member extends Vue {
@@ -180,6 +222,8 @@ export default class Member extends Vue {
   current: number = 1
   total: number = 0
   formDialog: boolean = false
+  uploaderDialog: boolean = false
+  fileList: any = []
 
   allClasses: any = []
 
@@ -192,16 +236,58 @@ export default class Member extends Vue {
   memberSpecialDaysForm: any = {}
   memberId: number = 0
 
+  downloadTemplateExcel() {
+    downloadTempExcelFile(excelHeader, 'member_template.xlsx')
+  }
+
+  clickUploadDialog() {
+    this.uploaderDialog = true
+  }
+
+  closerUploadDialog() {
+    this.uploaderDialog = false
+  }
+
+  clearFile() {
+    this.fileList = []
+  }
+
   created() {
     this.memberAllList()
     this.getAllClass()
+  }
+
+  async uploadFile(file: any) {
+    const data: any = await readExcel(file)
+ 
+    const finalData = formatSpecialDate(data)
+
+    console.log(finalData)
+
+    axios.post('/base/member/batch-create', finalData).then((res: any) => {
+            if (res) {
+                this.$notify({
+                    title: 'Msg',
+                    showClose: true,
+                    message: 'Upload success',
+                    type: 'success',
+                })
+                this.uploaderDialog = false
+                this.memberAllList()
+                this.fileList = []
+                file = undefined
+            }
+    })
+   
+
+
   }
 
    handleSpceialDaySizeChange(val: number) {
     this.searchForm.limit = val
     this.specialDays(this.memberId)
   }
-
+i
   handleSpceialDayCurrentChange(val: number) {
     this.searchForm.page = val
     this.specialDays(this.memberId)
@@ -351,6 +437,8 @@ export default class Member extends Vue {
       this.memberSpecialDaysForm = res.data.data
     })
   }
+
+  delSpecialDaysItem(id: number) {}
 
 }
 </script>

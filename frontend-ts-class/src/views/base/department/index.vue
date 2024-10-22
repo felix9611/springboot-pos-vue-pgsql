@@ -12,6 +12,10 @@
                 </el-form-item>
 
                 <el-form-item>
+                    <el-button @click="downloadTemplateExcel()">Download Template Excel</el-button>
+                </el-form-item>
+
+                <el-form-item>
                     <el-button @click="clickUploadDialog">Upload Excel</el-button>
                 </el-form-item>
 
@@ -129,7 +133,7 @@
 
 <script lang="ts">
 import axios from '@/axios'
-import { formatJson, readExcel } from '@/utils/importExcel'
+import { downloadTempExcelFile, formatJson, readExcel } from '@/utils/importExcel'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
 
@@ -189,23 +193,27 @@ export default class Department extends Vue {
         this.uploaderDialog = false
     }
 
+    downloadTemplateExcel() {
+        downloadTempExcelFile(this.testEcelHeader1, 'departments_template.xlsx')
+    }
+
     async uploadFile(file: any) {
         const data = await readExcel(file)
         const reData = formatJson(this.testEcelHeader1, this.testEcelHeader2, data)
-        reData.forEach( (res: any) => {
-        axios.post('/base/department/create', res).then((res: any) => {
-                        
+
+        axios.post('/base/department/batch-create', reData).then((res: any) => {
+            if (res) {
                 this.$notify({
                     title: 'Msg',
                     showClose: true,
                     message: 'Upload success',
                     type: 'success',
                 })
-                this.deptAllList()
                 this.uploaderDialog = false
-                file = undefined
+                this.deptAllList()
                 this.fileList = []
-            })
+                file = undefined
+            }
         })
     }
 

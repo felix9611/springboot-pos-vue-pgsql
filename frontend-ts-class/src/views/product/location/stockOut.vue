@@ -148,7 +148,7 @@ export default class StockIn extends Vue {
                 productId: rs.productId,
                 oldPlace: rs.placeId,
                 qty: renewQty,
-                cost: rs.cost,
+                totalPrice: rs.cost,
                 otherQty: rs.qty
               })
           }

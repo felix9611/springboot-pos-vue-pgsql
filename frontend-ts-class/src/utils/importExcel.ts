@@ -40,15 +40,34 @@ export function readExcel(file: UploadFile) {
 }
 
 export function formatJson (header: any, filterVal: any, jsonData: any) {
-  return jsonData.map((v: any)=> {
+  const updatedArray = jsonData.map((obj: any) => {
+    const newObj: any = {}
+
+    header.forEach((oldKey: string, index: number) => {
+      
+      const newKey = filterVal[index]
+      console.log(obj[oldKey])
+      if (obj[oldKey] !== undefined) {
+        newObj[newKey] = obj[oldKey]
+      }
+    })
+    return newObj
+  })
+  
+  return updatedArray
+
+  /* return jsonData.map((v: any)=> {
     const obj: any = {}
-    header.forEach((h, i) => {
+    header.forEach((h, i) => { 
       const anyD: any = [filterVal[i]]
+      
       const newData: any = v[h]
+      console.log(newData, 'data')
       obj[anyD] = newData
+      
     })
     return obj
-  })
+  }) */
 }
 
 export function formatJsonToSheet(filterVal: any, jsonData: any) {
@@ -64,6 +83,34 @@ sheet_add_aoa adds an array of arrays of JS data to an existing worksheet.
 sheet_add_json adds an array of JS objects to an existing worksheet.
 。
 */
+
+export function downloadTempExcelFile(
+  excelHeader: any, 
+  fileName: string, 
+  excelStyle?: any,
+  headerColSeetting? : any
+) {
+  const ws = XLSX.utils.aoa_to_sheet([excelHeader])
+  if (excelStyle) {
+    if (excelStyle) {
+      for (const [key] of Object.entries(ws)) {
+        if (key !== '!cols' && key !== '!ref') {
+          ws[key].s = excelStyle
+        }
+      }
+    }
+    if(headerColSeetting) {
+      ws['!cols'] = headerColSeetting['!cols']
+    }
+  }
+ // XLSX.utils.table_to_sheet(ws, { raw: true })
+  XLSX.utils.sheet_add_aoa(ws, [], { origin: 'A2' })
+  let wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
+  const wopts = { bookType: 'xlsx', bookSST: false , type: 'binary' }
+  const fileEx = XLSXS.write(wb, wopts)
+  saveAs(new Blob([s2ab(fileEx)],{type:""}), fileName)
+}
 export function saveJsonToExcel(
   headers: any, 
   data: any, 
@@ -87,7 +134,7 @@ export function saveJsonToExcel(
       ws['!cols'] = headerColSeetting['!cols']
     }
   }
-  console.log(ws)
+  XLSX.utils.table_to_sheet(dataSet, { raw: true })
   XLSX.utils.sheet_add_aoa(ws, dataSet, { origin: 'A2' })
   let wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')

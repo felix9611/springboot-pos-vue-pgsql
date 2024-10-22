@@ -11,13 +11,19 @@
                     </el-input>
                 </el-form-item>
 
-             <!--   <el-form-item>
-                    <el-button @click="clickUploadDialog">Upload Excel</el-button>
-                </el-form-item> -->
+                <el-form-item>
+                    <el-button @click="downloadTemplateExcel()">Download Template Excel</el-button>
+                </el-form-item>
+
 
                 <el-form-item>
-                    <el-button @click="deptAllList">Find</el-button>
+                    <el-button @click="clickUploadDialog">Upload Excel</el-button>
                 </el-form-item>
+
+                <el-form-item>
+                    <el-button @click="taxInfoAllList">Find</el-button>
+                </el-form-item>
+
 
                 <el-form-item>
                     <el-button type="primary" @click="dialogVisible = true">Create</el-button>
@@ -38,7 +44,6 @@
                         :on-remove="clearFile"
                         >
                         <el-button size="small" type="primary">Upload</el-button>
-                        <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
                     </el-upload>
         </el-dialog>
 
@@ -153,15 +158,17 @@
                 <el-form-item label="Tax Name"  prop="taxName" label-width="150px" class="lg:col-span-full">
                     <el-input v-model="editForm.taxName" autocomplete="off"></el-input>
                 </el-form-item>
-                
+
                 <el-form-item label="Tax Rate"  prop="taxRate" label-width="150px">
-                    <el-input type="number" v-model="editForm.taxRate" autocomplete="off" class="w-full"></el-input>
+                    <el-input type="number" v-model="editForm.taxRate" autocomplete="off">
+                        <template #append>%</template>
+                    </el-input>
                 </el-form-item>
-
                 <el-form-item label="Import Tax Rate"  prop="importTax" label-width="150px">
-                    <el-input type="number" v-model="editForm.importTax" autocomplete="off" class="w-full"></el-input>
+                    <el-input type="number" v-model="editForm.importTax" autocomplete="off">
+                        <template #append>%</template>
+                    </el-input>
                 </el-form-item>
-
 
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -174,7 +181,7 @@
 
 <script lang="ts">
 import axios from '@/axios'
-import { formatJson, readExcel } from '@/utils/importExcel'
+import { downloadTempExcelFile, formatJson, readExcel } from '@/utils/importExcel'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
 
@@ -185,13 +192,27 @@ export default class vendor extends Vue {
     tableData: any = []
 
     testEcelHeader1 = [
-        'Vendor Code',
-        'Vendor Name'
+        'Nation Code',
+        'Nation Name',
+        'Country Code',
+        'Country Name',
+        'Tax Type',
+        'Tax Code',
+        'Tax Name',
+        'Tax Rate',
+        'Import Rate'
     ]
 
     testEcelHeader2 = [
-        'vendorCode',
-        'vendorName'
+        'nationCode',
+        'nationName',
+        'countryCode',
+        'countryName',
+        'taxType',
+        'taxCode',
+        'taxName',
+        'taxRate',
+        'importRate'
     ]
 
     searchForm: any = {
@@ -218,7 +239,7 @@ export default class vendor extends Vue {
     }
 
     created() {
-        this.deptAllList()
+        this.taxInfoAllList()
     }
 
 
@@ -234,27 +255,51 @@ export default class vendor extends Vue {
         this.uploaderDialog = false
     }
 
+    downloadTemplateExcel() {
+        downloadTempExcelFile(this.testEcelHeader1, 'tax_informations_template.xlsx')
+    }
+
     async uploadFile(file: any) {
-        const data = await readExcel(file)
-        const reData = formatJson(this.testEcelHeader1, this.testEcelHeader2, data)
-        reData.forEach( (res: any) => {
-        axios.post('/system/country/tax/create', res).then((res: any) => {
-                        
+        const data: any = await readExcel(file)
+        console.log(data, 'updatedArray')
+
+        
+        const updatedArray = data.map(obj => {
+            const newObj: any = {};
+
+            Object.keys(obj).forEach((key) => {
+                const trimmedKey = key.trim(); // Trim spaces from the key
+                const index = this.testEcelHeader1.indexOf(trimmedKey);
+                if (index !== -1) {
+                // If the key is found in array1, replace it with the corresponding key from array2
+                newObj[this.testEcelHeader2[index]] = obj[key];
+                } else {
+                // If the key is not found in array1, copy it as is
+                newObj[key] = obj[key];
+                }
+            });
+
+            return newObj
+        })
+
+        
+        axios.post('/system/country/tax/batch-create', updatedArray).then((res: any) => {
+            if (res) {
                 this.$notify({
                     title: 'Msg',
                     showClose: true,
                     message: 'Upload success',
                     type: 'success',
                 })
-                this.deptAllList()
                 this.uploaderDialog = false
-                file = undefined
+                this.taxInfoAllList()
                 this.fileList = []
-            })
+                file = undefined
+            }
         })
     }
 
-    deptAllList() {
+    taxInfoAllList() {
         axios.post(
             '/system/country/tax/listAll',
             this.searchForm
@@ -295,12 +340,12 @@ export default class vendor extends Vue {
 
     handleSizeChange(val: any) {
         this.searchForm.limit = val
-        this.deptAllList()
+        this.taxInfoAllList()
     }
 
     handleCurrentChange(val: any) {
         this.searchForm.page = val
-        this.deptAllList()
+        this.taxInfoAllList()
     }
 
     resetForm(formName: string) {
@@ -323,10 +368,14 @@ export default class vendor extends Vue {
         const validData: any = this.$refs[formName]
         validData.validate((valid: any) => {
             if (valid) {
-                console.log(this.editForm)
+                this.editForm = {
+                    ...this.editForm,
+                    taxRate: this.editForm.taxRate / 100,
+                    importTax: this.editForm.importTax / 100
+                }
                 axios.post('/system/country/tax/' + (this.editForm.id ? 'update' : 'create'), this.editForm)
                     .then((res: any) => {
-                        this.deptAllList()
+                        this.taxInfoAllList()
                         this.$notify({
                             title: 'Msg',
                             showClose: true,
@@ -344,14 +393,19 @@ export default class vendor extends Vue {
 
     editHandle(id: number) {
         axios.get('/system/country/tax/' + id).then((res: any) => {
-            this.editForm = res.data.data
+            this.editForm = {
+                    ...res.data.data,
+                    taxRate: res.data.data.taxRate * 100,
+                    importTax: res.data.data.importTax * 100
+                }
             this.dialogVisible = true
+
         })
     }
 
     delItem(id: number) {
         axios.delete('/system/country/tax/remove/'+ id).then((res: any) => {
-            this.deptAllList()
+            this.taxInfoAllList()
             this.$notify({
                 title: '',
                 showClose: true,

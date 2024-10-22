@@ -22,6 +22,14 @@
                 <el-form-item>
                     <el-button type="primary" @click="goToCreated()">Create</el-button>
                 </el-form-item>
+
+                <el-form-item>
+                  <el-button @click="downloadTemplateExcel()">Download Template Excel</el-button>
+                </el-form-item>
+
+                <el-form-item>
+                  <el-button @click="clickUploadDialog()">Upload Excel</el-button>
+                </el-form-item>
             </el-form>
     </div>
 
@@ -157,6 +165,23 @@
        <qrcode-vue :value="qrTagContent" :size="250" level="M" />
      </div>
     </el-dialog>
+
+    <el-dialog
+      title="Upload Excel"
+      :visible.sync="uploaderDialog"
+      width="700px"
+      :before-close="closerUploadDialog">
+        <el-upload
+          class="upload-demo"
+          :auto-upload="false"
+          :file-list="fileList"
+          :on-change="uploadFile"
+          :on-remove="clearFile"
+          >
+            <el-button size="small" type="primary">Upload</el-button>
+            <!--<div slot="tip" class="el-upload__tip">Only Excel</div>-->
+            </el-upload>
+     </el-dialog>
   </div>
 </template>
 <script lang="ts">
@@ -166,8 +191,9 @@ import type { UploadFile } from 'element-plus/es/components/upload/src/upload.ty
 import { uploadImgToBase64 } from '@/utils/uploadImgToBase64'
 import moment from 'moment'
 import { Component, Vue } from 'vue-property-decorator'
-import { formatJson, readExcel } from '@/utils/importExcel'
+import { downloadTempExcelFile, formatJson, readExcel } from '@/utils/importExcel'
 import QrcodeVue from 'qrcode.vue'
+import { excelHeader, formatData } from './excelHeaders'
 
 @Component({
     components: {
@@ -176,6 +202,8 @@ import QrcodeVue from 'qrcode.vue'
     }
 })
 export default class ProductList extends Vue {
+  uploaderDialog: boolean = false
+  fileList: any = []
   dialogVisible: boolean = false
   searchForm: any = {
     limit: 10,
@@ -196,6 +224,22 @@ export default class ProductList extends Vue {
 
   created() {
     this.productList()
+  }
+
+  clickUploadDialog() {
+    this.uploaderDialog = true
+  }
+
+  closerUploadDialog() {
+    this.uploaderDialog = false
+  }
+
+  closeQRCodeDialog() {
+    this.qrCodeTagDialog = false
+  }
+  
+  clearFile() {
+    this.fileList = []
   }
 
   goToCreated() {
@@ -284,6 +328,34 @@ export default class ProductList extends Vue {
                 type: 'success'
         })
       })
-    } 
+  } 
+  downloadTemplateExcel() {
+    downloadTempExcelFile(excelHeader, 'product_template.xlsx')
+  }
+
+
+  async uploadFile(file: any) {
+    const data: any = await readExcel(file)
+ 
+    const finalData = formatData(data)
+
+    console.log(finalData)
+
+    axios.post('/product/batch-create', finalData).then((res: any) => {
+            if (res) {
+                this.$notify({
+                    title: 'Msg',
+                    showClose: true,
+                    message: 'Upload success',
+                    type: 'success',
+                })
+                this.uploaderDialog = false
+                this.productList()
+                this.fileList = []
+                file = []
+    }
+    })
+  }
+
 }
 </script>

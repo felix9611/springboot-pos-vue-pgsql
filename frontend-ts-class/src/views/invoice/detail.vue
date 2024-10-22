@@ -60,7 +60,7 @@
     <el-table
       class="px-5"
       ref="multipleTable"
-      :data="itemPay"
+      :data="detailForm.paymentItems"
       tooltip-effect="dark">
       <el-table-column 
           label="Amount" 
@@ -77,7 +77,7 @@
     <el-table
       class="px-5"
       ref="multipleTable"
-      :data="items"
+      :data="detailForm.invoiceItems"
       tooltip-effect="dark"
       id="tab1">
       <el-table-column 
@@ -139,9 +139,6 @@ export default class InoviceDetail extends Vue {
 
   created() {
     this.getDetail()
-    this.getPayment()
-    this.getItem()
-    // this.generatePDF()
   }
 
   getDetail() {
@@ -150,23 +147,6 @@ export default class InoviceDetail extends Vue {
         this.detailForm = res.data.data
         this.detailForm.createdAt = moment(new Date(this.detailForm.createdAt)).format('DD-MM-YYYY HH:MM')
         this.detailForm.voidAt = this.detailForm.voidAt ? moment(new Date(this.detailForm.voidAt)).format('DD-MM-YYYY HH:MM') : null
-      }
-    )
-  }
-
-  getPayment() {
-    axios.get(`/payment/list/${this.invoiceId}`).then(
-      (res: any) => {
-        this.itemPay = res.data.data
-      }
-    )
-  }
-
-  getItem() {
-    axios.get(`/invoice/item/${this.invoiceId}`).then(
-      (res: any) => {
-        this.items = res.data.data
-        console.log(res)
       }
     )
   }

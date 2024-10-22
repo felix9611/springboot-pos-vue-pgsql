@@ -10,10 +10,15 @@ import com.fixedasset.entity.StockTakeDetail;
 import com.fixedasset.entity.StockTakeForm;
 import com.fixedasset.service.StockTakeDetailService;
 import com.fixedasset.service.StockTakeFormService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+@Tag(name = "Stock Take")
 @RestController
 @RequestMapping("/stockTake")
 public class StockTakeFormController extends BaseController {
@@ -21,29 +26,34 @@ public class StockTakeFormController extends BaseController {
     @Resource private StockTakeDetailService stockTakeDetailService;
 
 
+    @Operation(summary = "Create")
     @PostMapping("/create")
     public Result saveRecord(@RequestBody StockTakeForm stockTakeForm) {
         stockTakeFormService.createStockTake(stockTakeForm);
         return Result.succ(stockTakeForm);
     }
 
+    @Operation(summary = "Void by id")
     @DeleteMapping("/void/{id}")
     public Result voidForm(@PathVariable("id") Long id) {
         stockTakeFormService.voidForm(id);
         return Result.succ("");
     }
 
+    @Operation(summary = "Finished by id")    
     @DeleteMapping("/finish/{id}")
     public Result finishForm(@PathVariable("id") Long id) {
         stockTakeFormService.finishForm(id);
         return Result.succ("");
     }
 
+    @Operation(summary = "Get by id")
     @GetMapping("/{id}")
     public Result getForm(@PathVariable("id") Long id) {
         return Result.succ(stockTakeFormService.getFrom(id));
     }
 
+    @Operation(summary = "Page and list")
     @PostMapping("/list")
     public Result listAll(@RequestBody StockTakeForm stockTakeForm) {
         Page page = new Page(stockTakeForm.getPage(), stockTakeForm.getLimit());
@@ -59,12 +69,14 @@ public class StockTakeFormController extends BaseController {
         return Result.succ(iPage);
     }
 
+    @Operation(summary = "Item stock take")
     @PostMapping("/item")
     public Result stockTakeItem(@RequestBody StockTakeDetail stockTakeDetail) {
         stockTakeDetailService.stockTakeItem(stockTakeDetail);
         return Result.succ(stockTakeDetail);
     }
 
+    @Operation(summary = "Stock take detail list")
     @PostMapping("/detail/list")
     public Result stockTakeItemList(@RequestBody StockTakeDetail stockTakeDetail) {
         Page page = new Page(stockTakeDetail.getPage(), stockTakeDetail.getLimit());

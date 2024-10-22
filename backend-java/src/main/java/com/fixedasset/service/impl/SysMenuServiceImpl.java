@@ -69,7 +69,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Override
     public List<SysMenu> tree() {
         // Get all
-        List<SysMenu> sysMenus = this.list(new QueryWrapper<SysMenu>().orderByAsc("orderNum").eq("statu", 1));
+        List<SysMenu> sysMenus = this.list(new QueryWrapper<SysMenu>().orderByAsc("order_num").eq("statu", 1));
 
         // Convert to tree structure JSON
         return buildTreeMenu(sysMenus);
