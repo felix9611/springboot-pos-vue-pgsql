@@ -33,8 +33,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return getOne(new QueryWrapper<SysUser>().eq("username", username));
     }
 
-
-
     @Override
     public String getUserAuthorityInfo(Long userId) {
 
@@ -47,7 +45,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             authority = (String) redisUtil.get("GrantedAuthority:" + sysUser.getUsername());
 
         } else {
-            // 获取角色编码
+            // Get role ids
             List<SysRole> roles = sysRoleService.list(new QueryWrapper<SysRole>()
                     .inSql("id", "select role_id from sys_user_role where user_id = " + userId));
 
@@ -56,7 +54,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 authority = roleCodes.concat(",");
             }
 
-            // 获取菜单操作编码
+            // Get menu perm codes
             List<Long> menuIds = sysUserMapper.getNavMenuIds(userId);
             if (menuIds.size() > 0) {
 

@@ -7,6 +7,10 @@ import com.fixedasset.common.lang.Result;
 import com.fixedasset.dto.InvRecordListDto;
 import com.fixedasset.entity.InvRecord;
 import com.fixedasset.service.InvRecordService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,11 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
+@Tag(name = "InvRecord")
 @RestController
 @RequestMapping("/inv/record")
 public class InvRecordController extends BaseController{
     @Resource private InvRecordService invRecordService;
 
+    @Operation(summary = "Page and list") 
     @PostMapping("/list")
     public Result listAll(@RequestBody InvRecord invRecord) {
         Page page = new Page(invRecord.getPage(), invRecord.getLimit());

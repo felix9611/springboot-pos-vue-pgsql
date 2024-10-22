@@ -15,6 +15,10 @@ import com.fixedasset.entity.SysRole;
 import com.fixedasset.entity.SysUser;
 import com.fixedasset.entity.SysUserRole;
 import com.fixedasset.service.LoginRecordService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,20 +28,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * <p>
- *  前端控制器
- * </p>
- *
- * @author WaiterXiaoYY
- * @since 2022-01-13
- */
+@Tag(name = "System User")
 @RestController
 @RequestMapping("/sys/user")
 public class SysUserController extends BaseController {
@@ -46,12 +42,13 @@ public class SysUserController extends BaseController {
 
     @Resource private LoginRecordService loginRecordService;
 
+    @Operation(summary = "User information getting")
     @GetMapping("/info/{id}")
     @PreAuthorize("hasAuthority('sys:user:list')")
     public Result info(@PathVariable("id") Long id) {
 
         SysUser sysUser = sysUserService.getById(id);
-        Assert.notNull(sysUser, "Not found the admin");
+        Assert.notNull(sysUser, "The administrator cannot be found");
 
         List<SysRole> roles = sysRoleService.listRolesByUserId(id);
 
@@ -59,6 +56,7 @@ public class SysUserController extends BaseController {
         return Result.succ(sysUser);
     }
 
+    @Operation(summary = "Page and list")
     @PostMapping("/list")
     @PreAuthorize("hasAuthority('sys:user:list')")
     public Result list(@RequestBody SysUser sysUser) {
@@ -83,6 +81,7 @@ public class SysUserController extends BaseController {
       */
     }
 
+    @Operation(summary = "Create a User")
     @PostMapping("/save")
     @PreAuthorize("hasAuthority('sys:user:save')")
     public Result save(@Validated @RequestBody SysUser sysUser) {
@@ -99,6 +98,7 @@ public class SysUserController extends BaseController {
         return Result.succ(sysUser);
     }
 
+    @Operation(summary = "Update a User")
     @PostMapping("/update")
     @PreAuthorize("hasAuthority('sys:user:update')")
     public Result update(@Validated @RequestBody SysUser sysUser) {
@@ -109,6 +109,7 @@ public class SysUserController extends BaseController {
         return Result.succ(sysUser);
     }
 
+    @Operation(summary = "Void a User")
     @Transactional
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sys:user:delete')")
@@ -120,6 +121,7 @@ public class SysUserController extends BaseController {
         return Result.succ("");
     }
 
+    @Operation(summary = "Role setting")
     @Transactional
     @PostMapping("/role/{userId}")
     @PreAuthorize("hasAuthority('sys:user:role')")
@@ -138,13 +140,13 @@ public class SysUserController extends BaseController {
         sysUserRoleService.remove(new QueryWrapper<SysUserRole>().eq("user_id", userId));
         sysUserRoleService.saveBatch(userRoles);
 
-        // Delete cache
         SysUser sysUser = sysUserService.getById(userId);
         sysUserService.clearUserAuthorityInfo(sysUser.getUsername());
 
         return Result.succ("");
     }
 
+    @Operation(summary = "Re password in user self")
     @PostMapping("/self/repass")
     public Result repass(@RequestBody ResetPasswordDto resetPasswordDto) {
 
@@ -155,6 +157,8 @@ public class SysUserController extends BaseController {
         return Result.succ("");
     }
 
+    
+    @Operation(summary = "Re password")
     @PostMapping("/repass")
     @PreAuthorize("hasAuthority('sys:user:repass')")
     public Result repass(@RequestBody Long userId) {
@@ -168,6 +172,7 @@ public class SysUserController extends BaseController {
         return Result.succ("");
     }
 
+    @Operation(summary = "Update avatar")
     @PutMapping("/updateIcon")
     public Result repass(@RequestBody SysUser sysUser) {
         sysUser.setUpdated(OffsetDateTime.now());
@@ -175,6 +180,7 @@ public class SysUserController extends BaseController {
         return Result.succ(sysUser);
     }
 
+    @Operation(summary = "Save new password")
     @PostMapping("/updatePass")
     public Result updatePass(@Validated @RequestBody PassDto passDto, Principal principal) {
 
@@ -182,7 +188,7 @@ public class SysUserController extends BaseController {
 
         boolean matches = passwordEncoder.matches(passDto.getCurrentPass(), sysUser.getPassword());
         if (!matches) {
-            return Result.fail("旧密码不正确");
+            return Result.fail("Old Password is wrong!");
         }
 
         sysUser.setPassword(passwordEncoder.encode(passDto.getPassword()));
@@ -192,12 +198,14 @@ public class SysUserController extends BaseController {
         return Result.succ("");
     }
 
+    @Operation(summary = "Save user login record")
     @PostMapping("/saveRecord")
     public Result saveRecord(@RequestBody LoginRecord loginRecord) {
         loginRecordService.saveData(loginRecord);
         return Result.succ(loginRecord);
     }
 
+    @Operation(summary = "Get list of user login records by username")
     @PostMapping("/listLoginRecord/{username}")
     public Result listRecord(@PathVariable("username") String username) {
         Page<LoginRecord> page = new Page(1, 10);
@@ -208,3 +216,4 @@ public class SysUserController extends BaseController {
         return Result.succ(iPage);
     }
 }
+
