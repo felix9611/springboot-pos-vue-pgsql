@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 // import sun.rmi.runtime.Log;
 
 /**
@@ -55,13 +56,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Override
+	public void configure(WebSecurity web) throws Exception {
+		web.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**");
+	}
 
     private static final String[] URL_WHITELIST = {
-            "/login",
-            "/logout",
-            "/captcha",
-            "/favicon.ico",
+        "/login",
+        "/logout",
+        "/captcha",
+        "/favicon.ico",
+        "/swagger-ui/**",
+        "/swagger-ui/index.html",
+        "/swagger-ui.html",
+         "/swagger.json/**"
     };
+
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
 

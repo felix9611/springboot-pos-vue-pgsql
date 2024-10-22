@@ -2,6 +2,11 @@ server:
   port: 8570
 # DataSource Config
 spring:
+  springdoc:
+    swagger-ui:
+        enabled: true
+        path: /swagger-ui.html
+    api-docs.path: /api-docs
   datasource:
     url: jdbc:postgresql://localhost:5432/pos-vue #?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Canada/Eastern&allowPublicKeyRetrieval=true
     username: admin
