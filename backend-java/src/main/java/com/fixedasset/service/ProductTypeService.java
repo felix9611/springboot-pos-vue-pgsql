@@ -13,4 +13,6 @@ public interface ProductTypeService extends IService<ProductType> {
     void updateOne(ProductType productType);
 
     List<ProductType> getAll();
+
+    void batchImport(List<ProductType> productTypes);
 }

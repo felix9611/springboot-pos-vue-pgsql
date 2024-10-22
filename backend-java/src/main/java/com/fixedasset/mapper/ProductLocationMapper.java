@@ -24,6 +24,7 @@ public interface ProductLocationMapper extends BaseMapper<ProductLocation> {
     @Select(wrapperSql)
     List<ProductLocationListDto> listAll(@Param("ew") Wrapper queryWrapper);
 
-    @Update("Update product_location SET qty = #{qty} where product_id = #{productId} and location_id = #{locationId}")
-    void updatePlaceQty(@Param("qty") int qty, @Param("productId") int productId,  @Param("locationId") int locationId);
+    @Update("Update product_location SET qty = #{qty}, total_price = #{totalPrice} where product_id = #{productId} and location_id = #{locationId}")
+    void updatePlaceQty(@Param("qty") int qty, @Param("totalPrice") double totalPrice, @Param("productId") int productId,  @Param("locationId") int locationId);
 }
+

@@ -28,6 +28,10 @@ public class ProductLocationServiceImpl extends ServiceImpl<ProductLocationMappe
 
     @Resource private InvRecord invRecord;
 
+    public void updateData(ProductLocation productLocation) {
+        productLocationMapper.updateById(productLocation);
+    }
+
     public void saveProductLoc(ProductLocation productLocation) {
         productLocationMapper.insert(productLocation);
 
@@ -35,13 +39,13 @@ public class ProductLocationServiceImpl extends ServiceImpl<ProductLocationMappe
         invRecord.setProductId(productLocation.getProductId());
         invRecord.setLocFrom(0);
         invRecord.setLocTo(productLocation.getLocationId());
-        invRecord.setCost(productLocation.getCost());
+        invRecord.setCost(productLocation.getTotalPrice());
         invRecord.setTimeAt(OffsetDateTime.now());
         invRecordService.saveRecord(invRecord);
     }
 
     public void changePlace(ProductLocationChangeDto productLocationChangeDto) {
-        productLocationMapper.updatePlaceQty(productLocationChangeDto.getQty(), productLocationChangeDto.getProductId(), productLocationChangeDto.getOldPlace());
+        productLocationMapper.updatePlaceQty(productLocationChangeDto.getQty(), 0, productLocationChangeDto.getProductId(), productLocationChangeDto.getOldPlace());
 
         invRecord.setQty(productLocationChangeDto.getOtherQty());
         invRecord.setProductId(productLocationChangeDto.getProductId());
@@ -57,14 +61,18 @@ public class ProductLocationServiceImpl extends ServiceImpl<ProductLocationMappe
         LambdaQueryWrapper<ProductLocation> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(ProductLocation::getLocationId, productLocation.getLocationId());
         queryWrapper.eq(ProductLocation::getProductId, productLocation.getProductId());
+        
+        ProductLocation oldRecord = productLocationMapper.selectOne(queryWrapper);
 
-        productLocationMapper.updatePlaceQty(productLocation.getQty(), productLocation.getProductId(), productLocation.getLocationId());
+        double newTotalPrice = oldRecord.getTotalPrice() - productLocation.getTotalPrice();
+
+        productLocationMapper.updatePlaceQty(productLocation.getQty(), newTotalPrice,  productLocation.getProductId(), productLocation.getLocationId());
 
         invRecord.setQty(productLocation.getOtherQty());
         invRecord.setProductId(productLocation.getProductId());
         invRecord.setLocFrom(-productLocation.getLocationId());
         invRecord.setLocTo(0);
-        invRecord.setCost(productLocation.getCost());
+        invRecord.setCost(productLocation.getTotalPrice());
         invRecord.setTimeAt(OffsetDateTime.now());
         invRecordService.saveRecord(invRecord);
 
