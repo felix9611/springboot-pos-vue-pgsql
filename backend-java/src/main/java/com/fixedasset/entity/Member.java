@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -46,10 +47,12 @@ public class Member {
 
     @Schema(description = "The created time stamp, only apply for respone")
     @TableField("created_at")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private OffsetDateTime createdAt;
 
     @Schema(description = "The updated time stamp, only apply for respone")
     @TableField("updated_at")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private OffsetDateTime updatedAt;
 
     @Schema(description = "1 = active, 0 = inactive")
