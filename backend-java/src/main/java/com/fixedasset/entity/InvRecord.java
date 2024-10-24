@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -44,6 +45,7 @@ public class InvRecord {
 
     @Schema(description = "The date time stamp, only apply for response")
     @TableField("time")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private OffsetDateTime timeAt;
 
     @Schema(description = "Only apply for paging in list api, the date time range from")
