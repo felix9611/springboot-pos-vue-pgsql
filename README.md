@@ -47,6 +47,16 @@ Example Image<br />
 <img src="/image/pos-3.png"><br />
 <img src="/image/pos-4.png"><br />
 
+Online Demo<br />
+------------
+https://felix-pos.web.app/login<br />
+Username: Demo<br />
+Password: 888888<br />
+
+Backend & Database deployed on koyeb<br />
+Frontend deployed on firebase<br />
+Maybe datas will slow to load, please wait it to load thanks<br />
+
 How to run this project<br />
 ------------
 Backend using port 8570<br />
