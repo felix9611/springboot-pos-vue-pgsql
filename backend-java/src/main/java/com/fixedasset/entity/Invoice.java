@@ -54,8 +54,8 @@ public class Invoice {
     @TableField("tax_ref_no")
     private String taxRefNo;
 
-    @Schema(description = "0 = active, 1 = void")
-    @TableField("void")
+    @Schema(description = "0 = active, 1 = void, 2 = have refund")
+    @TableField("void_num")
     private int voidNum;
 
     @Schema(description = "Created date time, Only apply for response")
