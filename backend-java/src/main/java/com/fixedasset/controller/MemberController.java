@@ -71,12 +71,16 @@ public class MemberController extends BaseController {
         Page page = new Page(member.getPage(), member.getLimit());
         LambdaQueryWrapper<Member> queryWrapper = Wrappers.lambdaQuery();
 
-        if (StringUtils.isNotBlank(member.getName())) {
-            queryWrapper.like(Member::getName, member.getName());
-        }
-
-        if (StringUtils.isNotBlank(member.getPhone())) {
-            queryWrapper.like(Member::getPhone, member.getPhone());
+        if (StringUtils.isNotBlank(member.getSearch())) {
+            queryWrapper.like(Member::getName, member.getSearch())
+                        .or()
+                        .like(Member::getFax, member.getSearch())
+                        .or()
+                        .like(Member::getEmail, member.getSearch())
+                        .or()
+                        .like(Member::getPhone, member.getSearch())
+                        .or()
+                        .like(Member::getAddress, member.getSearch());
         }
 
         queryWrapper.eq(Member::getStatus, 1);
@@ -138,12 +142,17 @@ public class MemberController extends BaseController {
     @PostMapping("/find")
     public Result findMember(@RequestBody Member member) {
         LambdaQueryWrapper<Member> queryWrapper = Wrappers.lambdaQuery();
-        if (StringUtils.isNotBlank(member.getName())) {
-            queryWrapper.like(Member::getName, member.getName());
-        }
 
-        if (StringUtils.isNotBlank(member.getPhone())) {
-            queryWrapper.like(Member::getPhone, member.getPhone());
+        if (StringUtils.isNotBlank(member.getSearch())) {
+            queryWrapper.like(Member::getName, member.getSearch())
+                        .or()
+                        .like(Member::getFax, member.getSearch())
+                        .or()
+                        .like(Member::getEmail, member.getSearch())
+                        .or()
+                        .like(Member::getPhone, member.getSearch())
+                        .or()
+                        .like(Member::getAddress, member.getSearch());
         }
 
         queryWrapper.eq(Member::getStatus, 1);

@@ -33,6 +33,18 @@ public class Location extends BaseEntity {
     @TableField("zip_code")
     private String zipCode;
 
+    @Schema(description = "The location address")
+    @TableField("email")
+    private String email;
+
+    @Schema(description = "The location phone number")
+    @TableField("phone")
+    private String phone;
+
+    @Schema(description = "The location zip code")
+    @TableField("fax")
+    private String fax;
+
     @Schema(description = "The remark")
     @TableField("remark")
     private String remark;
@@ -45,7 +57,7 @@ public class Location extends BaseEntity {
     @TableField(exist = false)
     private int limit = 10;
     
-    @Schema(description = "Find by Name or code")
+    @Schema(description = "The search")
     @TableField(exist = false)
-    private String name;
+    private String search;
 }

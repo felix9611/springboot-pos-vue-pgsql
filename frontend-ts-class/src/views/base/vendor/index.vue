@@ -4,12 +4,29 @@
             <el-form :inline="true">
                 <el-form-item>
                     <el-input
-                            v-model="searchForm.vendorCode"
-                            placeholder="Vendor Code"
+                            v-model="searchForm.name"
+                            placeholder="Vendor Code/Name"
                             clearable
                     >
                     </el-input>
-                </el-form-item>     
+                </el-form-item>    
+                <el-form-item>
+                    <el-input
+                            v-model="searchForm.place"
+                            placeholder="Place"
+                            clearable
+                    >
+                    </el-input>
+                </el-form-item>  
+
+                <el-form-item>
+                    <el-input
+                            v-model="searchForm.contact"
+                            placeholder="Contact"
+                            clearable
+                    >
+                    </el-input>
+                </el-form-item>  
 
                 <el-form-item>
                     <el-button @click="deptAllList">Find</el-button>

@@ -74,4 +74,8 @@ public class Member {
     @Schema(description = "For request only, if case member class name")
     @TableField(exist = false)
     private String className;
+
+    @Schema(description = "For search")
+    @TableField(exist = false)
+    private String search;
 }

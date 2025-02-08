@@ -4,8 +4,8 @@
             <el-form :inline="true">
                 <el-form-item>
                     <el-input
-                            v-model="searchForm.deptCode"
-                            placeholder="Department Code"
+                            v-model="searchForm.name"
+                            placeholder="Department Name/Code"
                             clearable
                     >
                     </el-input>

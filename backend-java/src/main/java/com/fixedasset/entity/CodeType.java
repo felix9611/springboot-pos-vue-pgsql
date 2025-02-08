@@ -31,7 +31,7 @@ public class CodeType extends BaseEntity {
     @TableField(exist = false)
     private int limit = 10;
 
-    @Schema(description = "Find by Name or code")
+    @Schema(description = "The value for search")
     @TableField(exist = false)
-    private String name;
+    private String value;
 }

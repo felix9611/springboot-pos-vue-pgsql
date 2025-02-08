@@ -70,8 +70,10 @@ public class ProductTypeController extends BaseController{
         Page page = new Page(productType.getPage(), productType.getLimit());
         LambdaQueryWrapper<ProductType> queryWrapper = Wrappers.lambdaQuery();
 
-        if (StringUtils.isNotBlank(productType.getTypeName())) {
-            queryWrapper.like(ProductType::getTypeName, productType.getTypeName());
+        if (StringUtils.isNotBlank(productType.getName())) {
+            queryWrapper.like(ProductType::getTypeCode, productType.getName())
+                        .or()
+                        .like(ProductType::getTypeName, productType.getName());
         }
 
         queryWrapper.eq(ProductType::getStatu, 1);

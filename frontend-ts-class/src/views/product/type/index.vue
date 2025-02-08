@@ -2,10 +2,10 @@
   <div class="container">
     <div class="handle-box">
       <el-form :inline="true">
-        <el-form-item label="Type Name" prop="typeName" label-width="100px">
+        <el-form-item prop="typeName" label-width="100px">
           <el-input
-            v-model="searchForm.typeName"
-            placeholder="Type Name"
+            v-model="searchForm.name"
+            placeholder="Type Name/Code"
             clearable
           />
         </el-form-item>

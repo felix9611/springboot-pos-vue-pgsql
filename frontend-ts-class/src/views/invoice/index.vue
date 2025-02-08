@@ -12,6 +12,21 @@
                     </el-input>
                 </el-form-item>
 
+                <el-form-item>
+                  <el-date-picker
+                    v-model="searchForm.createdAtStart"
+                    type="datetime"
+                    placeholder="Select Create From">
+                  </el-date-picker>
+                </el-form-item>
+                <el-form-item>
+                  <el-date-picker
+                    v-model="searchForm.createdAtEnd"
+                    type="datetime"
+                    placeholder="Select Create To">
+                  </el-date-picker>
+                </el-form-item>
+
                 <!--<el-form-item>
                     <el-button @click="clickUploadDialog">Upload Excel</el-button>
                 </el-form-item>-->

@@ -78,8 +78,12 @@ public class InvoiceController extends  BaseController{
             queryWrapper.eq(Invoice::getLocationId, invoice.getLocationId());
         }
 
-        if (!(invoice.getNumber() == null)) {
+        if (StringUtils.isNotBlank(invoice.getNumber())) {
             queryWrapper.like(Invoice::getNumber, invoice.getNumber());
+        }
+
+        if (!(invoice.getCreatedAtStart()==null) && !(invoice.getCreatedAtEnd()==null)) {
+            queryWrapper.between(Invoice::getCreatedAt, invoice.getCreatedAtStart(), invoice.getCreatedAtEnd());
         }
 
         Page<InvoiceListDto> iPage = invoiceService.listAll(page, queryWrapper);

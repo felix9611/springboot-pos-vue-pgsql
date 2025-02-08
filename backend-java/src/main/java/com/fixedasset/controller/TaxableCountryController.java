@@ -1,19 +1,16 @@
 package com.fixedasset.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fixedasset.common.lang.Result;
 import com.fixedasset.dto.TaxInformationUploadData;
-import com.fixedasset.entity.Location;
 import com.fixedasset.entity.TaxableCountry;
 import com.fixedasset.service.TaxableCountryService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import org.apache.ibatis.annotations.Delete;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -66,12 +63,24 @@ public class TaxableCountryController extends BaseController {
         Page page = new Page(taxableCountry.getPage(), taxableCountry.getLimit());
         LambdaQueryWrapper<TaxableCountry> queryWrapper = Wrappers.lambdaQuery();
 
-        if (!StringUtils.isEmpty(taxableCountry.getCountryName())) {
-            queryWrapper.like(TaxableCountry::getCountryName, taxableCountry.getCountryName());
+        if (StringUtils.isNotBlank(taxableCountry.getNameCode())) {
+            queryWrapper
+            .like(TaxableCountry::getNationCode, taxableCountry.getNameCode())
+            .or()
+            .like(TaxableCountry::getNationName, taxableCountry.getNameCode())
+            .or()
+            .like(TaxableCountry::getNationName, taxableCountry.getNameCode())
+            .or()
+            .like(TaxableCountry::getCountryName, taxableCountry.getNameCode());
         }
 
-        if (!StringUtils.isEmpty(taxableCountry.getTaxName())) {
-            queryWrapper.like(TaxableCountry::getTaxName, taxableCountry.getTaxName());
+        if (StringUtils.isNotBlank(taxableCountry.getTax())) {
+            queryWrapper
+            .like(TaxableCountry::getTaxType, taxableCountry.getTax())
+            .or()
+            .like(TaxableCountry::getTaxCode, taxableCountry.getTax())
+            .or()
+            .like(TaxableCountry::getTaxName, taxableCountry.getTax());
         }
 
         queryWrapper.eq(TaxableCountry::getStatu, 1);

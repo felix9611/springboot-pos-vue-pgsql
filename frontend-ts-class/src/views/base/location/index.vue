@@ -4,8 +4,8 @@
             <el-form :inline="true">
                 <el-form-item>
                     <el-input
-                            v-model="searchForm.deptCode"
-                            placeholder="Department Code"
+                            v-model="searchForm.search"
+                            placeholder="Shop search"
                             clearable
                     >
                     </el-input>
@@ -39,12 +39,20 @@
             <el-table-column
                 sortable
                 prop="placeCode"
-                label="Place Code"
+                label="Shop Code"
                 width="150">
             </el-table-column>
             <el-table-column
               prop="placeName"
-              label="Place Name">
+              label="Shop Name">
+            </el-table-column>
+            <el-table-column
+              prop="country"
+              label="Country">
+            </el-table-column>
+            <el-table-column
+              prop="phone"
+              label="Phone">
             </el-table-column>
             <el-table-column
                     prop="created"
@@ -102,6 +110,26 @@
                 <el-form-item label="Other Name"  prop="deptOtherName" label-width="100px">
                     <el-input type="textarea" v-model="editForm.placeOtherName"></el-input>
                 </el-form-item>
+
+                <el-form-item label="Country"  prop="country" label-width="100px">
+                    <el-input type="textarea" v-model="editForm.country"></el-input>
+                </el-form-item>
+
+                <el-form-item label="Address"  prop="address" label-width="100px">
+                    <el-input type="textarea" v-model="editForm.address"></el-input>
+                </el-form-item>
+                <el-form-item label="ZIP Code"  prop="zipCode" label-width="100px">
+                    <el-input v-model="editForm.zipCode" autocomplete="off"></el-input>
+                </el-form-item>
+
+                <el-form-item label="Phone"  prop="phone" label-width="100px">
+                    <el-input v-model="editForm.phone"></el-input>
+                </el-form-item>
+
+                <el-form-item label="Tax"  prop="tax" label-width="100px">
+                    <el-input v-model="editForm.tax"></el-input>
+                </el-form-item>
+
                 <el-form-item label="Remark"  prop="deptOtherName" label-width="100px">
                     <el-input type="textarea" v-model="editForm.remark"></el-input>
                 </el-form-item>
