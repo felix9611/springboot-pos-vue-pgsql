@@ -35,5 +35,8 @@ public class Department extends BaseEntity {
     @TableField(exist = false)
     private int limit = 10;
 
+    @Schema(description = "The name for search")
+    @TableField(exist = false)
+    private String name;
 }
 

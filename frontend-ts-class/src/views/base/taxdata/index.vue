@@ -4,12 +4,21 @@
             <el-form :inline="true">
                 <el-form-item>
                     <el-input
-                            v-model="searchForm.countryName"
-                            placeholder="Country Name"
-                            clearable
+                        v-model="searchForm.nameCode"
+                        placeholder="Country Name/Code"
+                        clearable
                     >
                     </el-input>
-                </el-form-item>
+                </el-form-item> 
+
+                <el-form-item>
+                    <el-input
+                        v-model="searchForm.tax"
+                        placeholder="Tax"
+                        clearable
+                    >
+                    </el-input>
+                </el-form-item> 
 
                 <el-form-item>
                     <el-button @click="downloadTemplateExcel()">Download Template Excel</el-button>

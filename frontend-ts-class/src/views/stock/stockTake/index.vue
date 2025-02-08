@@ -4,11 +4,26 @@
             <el-form :inline="true">
                 <el-form-item>
                     <el-input
-                      v-model="searchForm.actionName"
+                      v-model="searchForm.name"
                       placeholder="Action Name"
                       clearable
                     >
                     </el-input>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-date-picker
+                        v-model="searchForm.startTime"
+                        type="datetime"
+                        placeholder="Select From">
+                    </el-date-picker>
+                    </el-form-item>
+                    <el-form-item>
+                    <el-date-picker
+                        v-model="searchForm.endTime"
+                        type="datetime"
+                        placeholder="Select To">
+                    </el-date-picker>
                 </el-form-item>
 
                 <el-form-item>

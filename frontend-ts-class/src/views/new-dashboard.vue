@@ -46,25 +46,19 @@
             <div class="font-bold p-1">
                 Sell Total Per Shop
             </div>
-            <div class="p-1">
-                <ChartJs v-bind="chartsSetD" />
-            </div>
+            <PlotlyChart v-bind="chartsSetD" />
         </div>
-        <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
+        <div class="lg:col-span-full shadow-lg rounded-lg bg-white">
             <div class="font-bold p-1">
-                Top 10 Sell Total Price Per Product
+                Top 10 Sell Total Price per Product
             </div>
-            <div class="p-1">
-                <ChartJs v-bind="chartsSetE" />
-            </div>
+            <PlotlyChart v-bind="chartsSetE" />
         </div>
-        <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
+        <div class="lg:col-span-full shadow-lg rounded-lg bg-white">
             <div class="font-bold p-1">
-                Top 10 Sell Qtys Per Product
+                Top 10 Sell Qtys & In-stock Qtys By Product
             </div>
-            <div class="p-1">
-                <ChartJs v-bind="chartsSetF" />
-            </div>
+            <PlotlyChart v-bind="chartsSetK" />
         </div>
         <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
             <div class="font-bold p-1">
@@ -98,6 +92,7 @@
                 <ChartJs v-bind="chartsSetJ" />
             </div>
         </div>
+        
     </div>
 </template>
 <script lang="ts">
@@ -107,12 +102,14 @@ import { Component, Vue } from 'vue-property-decorator'
 import ApexChartOne from '@/components/charts/apex/apexOne.vue'
 import ChartJsStackedChart from '@/components/charts/chartJs/StackedChart.vue'
 import ChartJs from '@/components/charts/chartJs/index.vue'
+import PlotlyChart from '@/components/charts/plotyjs/index.vue'
 
 @Component({
     components: {
         ChartJsStackedChart,
         ApexChartOne,
-        ChartJs
+        ChartJs,
+        PlotlyChart
     }
 })
 export default class Dashboard extends Vue {
@@ -131,6 +128,8 @@ export default class Dashboard extends Vue {
     queryCountSalesByTypeList: any = [] 
     queryCountSalesByDeptList: any = [] 
     queryTotalSalesByDeptList: any = [] 
+
+    queryInStockQtysList: any = [] 
 
     get chartsSetA() {
         return {
@@ -188,21 +187,56 @@ export default class Dashboard extends Vue {
     }
 
     get chartsSetD() {
+        const labels = this.queryCountShopList.map((x: any) => x.placeName)
+        const yData = this.queryCountShopList.map((x: any) => x.count)
         return {
-            width: 1000,
-            heigh: 90,
-            type: 'bar',
-            datasetKey: 'placeName',
-            value: 'count',
-            data: this.queryCountShopList,
-            label: 'Total Qtys',
-            colors: '#a1d41b'
+            plotyData: [
+                {
+                    name: 'Total Qtys',
+                    x: labels,
+                    y: yData,
+                    type: 'bar',
+                }
+            ],
+            plotyLayout: {
+                margin: {
+                    l: 50,
+                    r: 50,
+                    b: 70,
+                    t: 30,
+                    pad: 4
+                },
+                legend: {orientation:"h", xanchor: 'center', x:0.5, y:1 },
+                height: 300
+            }
         }
     }
 
     get chartsSetE() {
+        const labels = this.querySalesByProductList.map((x: any) => x.productName)
+        const totalPrice = this.querySalesByProductList.map((x: any) => x.totalPrice)
         return {
-            width: 1000,
+            plotyData: [
+                {
+                    x: labels,
+                    y: totalPrice,
+                    type: 'bar',
+                    name: 'Total Price($)',
+                    hovertemplate: 'Total Price: %{y:$.2f}<extra></extra>',
+                }
+            ],
+            plotyLayout: {
+                margin: {
+                    l: 50,
+                    r: 50,
+                    b: 30,
+                    t: 30,
+                    pad: 4
+                },
+                legend: {orientation:"h", xanchor: 'center', x:0.5, y:1 },
+                height: 300
+            }
+         /*   width: 1000,
             heigh: 90,
             type: 'bar',
             datasetKey: 'productName',
@@ -210,6 +244,7 @@ export default class Dashboard extends Vue {
             data: this.querySalesByProductList,
             label: 'Total Price($)',
             colors: '#a1d41b'
+        */
         }
     }
 
@@ -278,6 +313,65 @@ export default class Dashboard extends Vue {
         }
     }
 
+
+    get chartsSetK() {
+   
+        const queryInStockQtysList = this.queryInStockQtysList
+        const querySalesByProductCountList = this.querySalesByProductCountList
+        const tempData = [...queryInStockQtysList, ...querySalesByProductCountList]
+
+        const mergedData = Array.from(
+            tempData.reduce((map, item) => {
+                const key = item.productName;
+                const existingItem = map.get(key) || {};
+                
+                // Merge properties dynamically
+                map.set(key, {
+                    ...existingItem,
+                    ...item,
+                    productName: key, // Ensure productName is retained
+                    inStockQtys: item.inStockQtys || existingItem.inStockQtys || 0,
+                    counts: item.counts || existingItem.counts || 0
+                });
+                
+                return map;
+            }, new Map()).values()
+        );
+
+        const labels = mergedData.map((x: any) => x.productName)
+        const inStockQtys = mergedData.map((x: any) => x.inStockQtys)
+        const saleQtys = mergedData.map((x: any) => x.counts)
+
+        return {
+            plotyData: [
+                {
+                    x: labels,
+                    y: inStockQtys,
+                    type: 'bar',
+                    name: 'In Stock Qtys'
+                },
+                {
+                    x: labels,
+                    y: saleQtys,
+                    type: 'bar',
+                    name: 'Sales Qtys'
+
+                }
+            ],
+            plotyLayout: {
+                margin: {
+                    l: 50,
+                    r: 50,
+                    b: 30,
+                    t: 30,
+                    pad: 4
+                },
+                legend: {orientation:"h", xanchor: 'center', x:0.5, y:1 },
+                height: 300
+            }
+        }
+    }
+
     goToFind() {
         const [from, to] = this.dates
         this.groupByFind = {
@@ -310,6 +404,17 @@ export default class Dashboard extends Vue {
         this.queryCountSalesByType()
         this.queryCountSalesByDept()
         this.queryTotalSalesByDept()
+        this.queryInStockQtys()
+
+        
+    }
+
+    queryInStockQtys() {
+        axios.get('/product/location/queryInStockQtys').then(
+            (res: any) => {
+                this.queryInStockQtysList = res.data.data
+            }
+        )
     }
 
     queryTotalSalesByDept() {
@@ -347,7 +452,6 @@ export default class Dashboard extends Vue {
     querySalesByProductCounts() {
         axios.post('/invoice/querySalesByProductCounts', this.groupByFind).then(
             (res: any) => {
-                console.log(res, 'querySalesByProductCounts')
                 this.querySalesByProductCountList = res.data.data
             }
         )

@@ -3,7 +3,7 @@
     <div class="grid lg:grid-cols-2 gap-3">
       <div> <!-- barcode scan or type-->
         <el-form :inline="true">
-          <el-form-item label="Place" prop="place" label-width="120px" v-if="userPlaceId === 0">
+          <el-form-item label="Place" prop="place" label-width="120px">
             <el-select v-model="placeId" placeholder="Select" filterable>
               <el-option
                 v-for="placeItems in placeList"
@@ -104,12 +104,12 @@
             </el-table-column>
         </el-table>
         <el-form :inline="true" class="py-6">
-          <el-form-item label="Member Name"  prop="name" label-width="130px">
+          <el-form-item label="Member"  prop="name" label-width="130px">
             <el-input v-model="memberNameFind" autocomplete="off"></el-input>
           </el-form-item>
 
           <el-form-item>
-            <el-button type="primary" @click="findMember()">Select</el-button>
+            <el-button type="primary" @click="findMember()">Find</el-button>
           </el-form-item>
         </el-form>
 
@@ -419,7 +419,7 @@ export default class POSpage extends Vue {
       if (Number(this.memberNameFind)) {
         axios.post(
           '/base/member/find', 
-          { phone: this.memberNameFind })
+          { search: this.memberNameFind })
         .then(
           (res: any) => {
             this.foundMemberList = res.data.data

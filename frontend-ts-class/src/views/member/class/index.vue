@@ -3,6 +3,14 @@
     <div class="handle-box">
       <el-form :inline="true">
         <el-form-item>
+          <el-input
+            v-model="searchForm.search"
+            placeholder="Search"
+            clearable
+          >
+          </el-input>
+        </el-form-item>
+        <el-form-item>
           <el-button @click="classAllList">Find</el-button>
         </el-form-item>
         <el-form-item>

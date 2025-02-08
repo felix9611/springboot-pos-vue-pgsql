@@ -1,6 +1,7 @@
 package com.fixedasset.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fixedasset.common.lang.Result;
@@ -62,6 +63,15 @@ public class StockTakeFormController extends BaseController {
         if (!(stockTakeForm.getStatus()==0)) {
             queryWrapper.eq(StockTakeForm::getStatus, stockTakeForm.getStatus());
         }
+
+        if (StringUtils.isNotBlank(stockTakeForm.getName())) {
+            queryWrapper.like(StockTakeForm::getName, stockTakeForm.getName());
+        }
+
+        if (!(stockTakeForm.getStartTime() == null) && !(stockTakeForm.getEndTime() == null)) {
+            queryWrapper.between(StockTakeForm::getStartTime, stockTakeForm.getStartTime(), stockTakeForm.getEndTime());
+        }
+        
         queryWrapper.orderByDesc(StockTakeForm::getId);
 
         Page<StockTakeFormListDto> iPage = stockTakeFormService.newPage(page, queryWrapper);

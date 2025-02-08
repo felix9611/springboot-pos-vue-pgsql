@@ -11,6 +11,17 @@
                     </el-input>
                 </el-form-item>
 
+                <el-form-item prop="type">
+                  <el-select v-model="searchForm.typeId" placeholder="Select Type" filterable class="w-full">
+                    <el-option
+                      v-for="typeItems in typeItem"
+                      :key="typeItems.id"
+                      :label="typeItems.typeName"
+                      :value="typeItems.id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+
                 <!--<el-form-item>
                     <el-button @click="clickUploadDialog">Upload Excel</el-button>
                 </el-form-item>-->
@@ -221,9 +232,20 @@ export default class ProductList extends Vue {
   qrCodeTagDialog: boolean = false
   qrTagContent: string = ''
   fileBase64Data: any = []
+  typeItem: any = []
 
   created() {
     this.productList()
+    this.getAllType()
+  }
+
+  getAllType() {
+        axios.get(
+            '/product/type/getAll'
+        ).then(
+            (res: any) => {
+            this.typeItem = res.data.data
+        })
   }
 
   clickUploadDialog() {

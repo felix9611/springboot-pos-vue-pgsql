@@ -4,22 +4,14 @@
       <el-form :inline="true">
         <el-form-item>
           <el-input
-            v-model="searchForm.name"
-            placeholder="Phone"
+            v-model="searchForm.search"
+            placeholder="Search"
             clearable
           >
           </el-input>
         </el-form-item>
         <el-form-item>
-          <el-input
-            v-model="searchForm.phone"
-            placeholder="Phone"
-            clearable
-          >
-          </el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button @click="memberAllList">Find</el-button>
+          <el-button @click="memberAllList()">Find</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="dialogVisible">Create</el-button>
@@ -54,11 +46,6 @@
         sortable
         prop="email"
         label="Email">
-      </el-table-column>
-      <el-table-column
-        sortable
-        prop="fax"
-        label="Fax">
       </el-table-column>
       <el-table-column
         sortable

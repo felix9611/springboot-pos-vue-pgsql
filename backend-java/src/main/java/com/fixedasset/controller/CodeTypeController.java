@@ -69,16 +69,12 @@ public class CodeTypeController extends BaseController {
         Page page = new Page(codeType.getPage(), codeType.getLimit());
         LambdaQueryWrapper<CodeType> queryWrapper = Wrappers.lambdaQuery();
 
-        if(!StringUtils.isEmpty(codeType.getType())) {
-            queryWrapper.like(CodeType::getType, codeType.getType());
-        }
-
-        if(!StringUtils.isEmpty(codeType.getValueCode())) {
-            queryWrapper.like(CodeType::getValueCode, codeType.getValueCode());
-        }
-
-        if(!StringUtils.isEmpty(codeType.getValueName())) {
-            queryWrapper.like(CodeType::getValueName, codeType.getValueName());
+        if(!StringUtils.isEmpty(codeType.getValue())) {
+            queryWrapper.like(CodeType::getType, codeType.getValue())
+                        .or()
+                        .like(CodeType::getValueCode, codeType.getValue())
+                        .or()
+                        .like(CodeType::getValueName, codeType.getValue());
         }
 
         queryWrapper.eq(CodeType::getStatu, 1);
