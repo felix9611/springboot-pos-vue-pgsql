@@ -9,7 +9,7 @@ const routes = [
 
     {
         path: '/',
-        redirect: '/dashboard/new'
+        redirect: '/pos/sell'
     },
     {
         path: '/',
