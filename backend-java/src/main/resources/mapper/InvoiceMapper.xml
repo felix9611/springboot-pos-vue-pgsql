@@ -133,4 +133,15 @@
             left join member_class as mc on m.class  = mc.id 
             left join location as loc on inv.location_id = loc.id ) AS q ${ew.customSqlSegment}
     </select>
+
+    <select id="queryTotalYearWeek" resultType="com.fixedasset.dto.charts.QueryTotalYearWeek">
+        SELECT concat(year(created_at), '-', week(created_at)) AS yearWeek, 
+        sum(total_amount) AS income,
+        sum(cost_price * iitem.qty) AS costPrice,
+        (sum(total_amount) - sum(cost_price * iitem.qty)) AS difference 
+        FROM pos_springboot_vue_3.invoice_item AS iitem ${ew.customSqlSegment}
+        LEFT JOIN invoice AS inv ON inv.id = iitem.invoice_id
+        LEFT JOIN product_list AS pl ON pl.id = iitem.product_id 
+        GROUP BY concat(year(created_at), '-', week(created_at));
+    </select>
 </mapper>

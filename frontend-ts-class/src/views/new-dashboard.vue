@@ -20,10 +20,11 @@
         </el-row>
         <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
             <div class="font-bold p-1">
-                Total Income by Year-Month
+                Total Income by Year-Month123
             </div>
             <div class="p-1">
-                <ChartJs v-bind="chartsSetA" /> 
+                <PlotlyChart v-bind="chartsSetE" />
+                <!--<ChartJs v-bind="chartsSetA" /> -->
             </div>
         </div>
         <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
