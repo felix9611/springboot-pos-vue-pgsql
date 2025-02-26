@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fixedasset.mapper.ProductLocationMapper">
+    <select id="queryInStockQtys" resultType="com.fixedasset.dto.ProductLocationListDto">
+        SELECT 
+            pl.product_name as productName, 
+            sum(ploc.qty) as inStockQtys 
+        FROM product_location as ploc 
+        LEFT JOIN product_list as pl on pl.id = ploc.product_id
+        GROUP by pl.product_name;
+    </select>
+
+    <update id="updatePlaceQty">
+        UPDATE product_location SET qty = #{qty}, total_price = #{totalPrice} 
+            WHERE 
+                product_id = #{productId} AND location_id = #{locationId}
+    </update>
+</mapper>

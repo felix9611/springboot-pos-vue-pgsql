@@ -16,7 +16,7 @@
             <el-input-number v-model="stockInForm.cost"></el-input-number>
           </el-form-item>
           <el-form-item label="Place From" prop="placeFrom" label-width="130px">
-            <el-select v-model="stockInForm.placeFrom" placeholder="Select" filterable>
+            <el-select v-model="stockInForm.oldPlace" placeholder="Select" filterable>
               <el-option
                 v-for="placeItems in placeList"
                 :key="placeItems.id"
@@ -26,7 +26,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="Place To" prop="placeTO" label-width="130px">
-            <el-select v-model="stockInForm.placeTo" placeholder="Select" filterable>
+            <el-select v-model="stockInForm.newPlace" placeholder="Select" filterable>
               <el-option
                 v-for="placeItems in placeList"
                 :key="placeItems.id"
@@ -118,10 +118,10 @@ export default class StockIn extends Vue {
     )
   }
 
-  @Watch('stockInForm.placeTo', { immediate: true, deep: true })
+  @Watch('stockInForm.newPlace', { immediate: true, deep: true })
   locaationDetal() {
-    if (this.stockInForm.placeTo) {
-      axios.get(`/base/location/${this.stockInForm.placeTo}`)
+    if (this.stockInForm.newPlace) {
+      axios.get(`/base/location/${this.stockInForm.newPlace}`)
       .then(
         (res: any) => {
           this.stockInForm.placeNameTo = res.data.data.placeName
@@ -130,10 +130,10 @@ export default class StockIn extends Vue {
     }
   }
 
-  @Watch('stockInForm.placeFrom', { immediate: true, deep: true })
+  @Watch('stockInForm.oldPlace', { immediate: true, deep: true })
   locaationFronDetal() {
-    if (this.stockInForm.placeFrom) {
-      axios.get(`/base/location/${this.stockInForm.placeFrom}`)
+    if (this.stockInForm.oldPlace) {
+      axios.get(`/base/location/${this.stockInForm.oldPlace}`)
       .then(
         (res: any) => {
           this.stockInForm.placeNameFrom = res.data.data.placeName
@@ -155,8 +155,21 @@ export default class StockIn extends Vue {
     this.stockInList = []
   }
 
-  submitList() {
-    this.stockInList.forEach((rs: any, i: number) => {
+  async submitList() {
+    await axios.post('/product/location/renew', this.stockInList).then((res: any) => {
+      if (res.data.code === 200) {
+        this.$notify({
+          title: '',
+          showClose: true,
+          message: 'Success to save',
+          type: 'success'
+        })
+        this.stockInList = []
+      }
+    })
+
+    
+    /* this.stockInList.forEach((rs: any, i: number) => {
       setTimeout(
         function(){
           axios.post('/product/location/find',
@@ -194,8 +207,8 @@ export default class StockIn extends Vue {
           message: 'Success to save',
           type: 'success'
       })
-    })
-  }
+    })*/
+  } 
 }
 </script>
 <style>

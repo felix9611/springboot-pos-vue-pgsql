@@ -12,10 +12,13 @@ import com.fixedasset.service.ProductLocationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -29,21 +32,16 @@ public class ProductLocationController extends BaseController{
 
     @Operation(summary = "Save to location")    
     @PostMapping("/save")
-    public Result saveQty(@RequestBody ProductLocation productLocation) {
-        ProductLocation oldRecord = productLocationService.findOne(productLocation);
-        if (oldRecord != null) {
-            ProductLocation renewRecord = new ProductLocation();
-            renewRecord.setLocationId(productLocation.getLocationId());
-            renewRecord.setProductId(productLocation.getProductId());
-            int newQty = 0;
-            newQty = oldRecord.getQty() + productLocation.getQty();
-            renewRecord.setQty(newQty);
-            productLocationService.changeQty(renewRecord);
-
-        } else if (oldRecord == null) {
-            productLocationService.saveProductLoc(productLocation);
+    public Result saveQty(@RequestBody List<ProductLocation> productLocations) {
+        for (ProductLocation productLocation : productLocations) {
+            ProductLocation oldRecord = productLocationService.findOne(productLocation);
+            if (oldRecord != null) {
+                productLocationService.updateQty(productLocation);
+            } else if (oldRecord == null) {
+                productLocationService.saveProductLoc(productLocation);
+            }
         }
-        return Result.succ(productLocation);
+        return Result.succ(productLocations);
     }
 
     @Operation(summary = "Find by location & product")    
@@ -54,18 +52,20 @@ public class ProductLocationController extends BaseController{
 
     @Operation(summary = "Renew data")   
     @PostMapping("/renew")
-    public Result renewPlace(@RequestBody ProductLocationChangeDto productLocationChangeDto) {
-        productLocationService.changePlace(productLocationChangeDto);
-        return Result.succ(productLocationChangeDto);
+    public Result renewPlace(@RequestBody List<ProductLocationChangeDto> productLocationChangeDtos) {
+        for (ProductLocationChangeDto productLocationChangeDto : productLocationChangeDtos) {
+            productLocationService.changePlace(productLocationChangeDto);
+        }
+        return Result.succ(productLocationChangeDtos);
     }
 
     @Operation(summary = "Stock out")   
     @PostMapping("/stock/out")
-    public Result stockOut(@RequestBody ProductLocation productLocationChangeDto) {
-        int newQty = -productLocationChangeDto.getOtherQty();
-        productLocationChangeDto.setOtherQty(newQty);
-        productLocationService.changeQty(productLocationChangeDto);
-        return Result.succ(productLocationChangeDto);
+    public Result stockOut(@RequestBody List<ProductLocation> productLocationChangeDtos) {
+        for (ProductLocation productLocationChangeDto : productLocationChangeDtos) {
+            productLocationService.changeQty(productLocationChangeDto);
+        }
+        return Result.succ(productLocationChangeDtos);
     }
 
     @Operation(summary = "Page and list")   
@@ -92,6 +92,12 @@ public class ProductLocationController extends BaseController{
         }
 
         return Result.succ(productLocationService.listAll(queryWrapper));
+    }
+
+    @Operation(summary = "Query in stock list")
+    @GetMapping("/queryInStockQtys")
+    public Result queryInStockQtys() {
+        return Result.succ(productLocationService.queryInStockQtys());
     }
 
 }

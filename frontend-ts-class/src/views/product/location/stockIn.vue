@@ -16,7 +16,7 @@
             <el-input-number v-model="stockInForm.qty"></el-input-number>
           </el-form-item>
           <el-form-item label="Place" prop="place" label-width="130px">
-            <el-select v-model="stockInForm.placeId" placeholder="Select" filterable>
+            <el-select v-model="stockInForm.locationId" placeholder="Select" filterable>
               <el-option
                 v-for="placeItems in placeList"
                 :key="placeItems.id"
@@ -118,10 +118,10 @@ export default class StockIn extends Vue {
     }
   }
 
-  @Watch('stockInForm.placeId', { immediate: true, deep: true })
+  @Watch('stockInForm.locationId', { immediate: true, deep: true })
   locaationDetal() {
     if (this.stockInForm.placeId) {
-      axios.get(`/base/location/${this.stockInForm.placeId}`)
+      axios.get(`/base/location/${this.stockInForm.locationId}`)
       .then(
         (res: any) => {
           this.stockInForm.placeName = res.data.data.placeName
@@ -143,8 +143,19 @@ export default class StockIn extends Vue {
     this.stockInList = []
   }
 
-  submitList() {
-    this.stockInList.forEach(
+  async submitList() {
+    await axios.post('/product/location/save', this.stockInList).then((res: any) => {
+      if (res.data.code === 200) {
+        this.$notify({
+          title: '',
+          showClose: true,
+          message: 'Success to save',
+          type: 'success'
+        })
+        this.stockInList = []
+      }
+    })
+    /* this.stockInList.forEach(
       (rs: any, i: number) => {
         setTimeout(
           function(){
@@ -169,7 +180,7 @@ export default class StockIn extends Vue {
           })
           this.stockInList = []
       }
-    )
+    ) */
   }
 
 }
