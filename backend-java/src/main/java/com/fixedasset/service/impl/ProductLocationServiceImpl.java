@@ -182,4 +182,8 @@ public class ProductLocationServiceImpl extends ServiceImpl<ProductLocationMappe
         return productLocationMapper.listAll(wrappers);
     }
 
+    public List<ProductLocationListDto> queryInStockQtys() {
+        return productLocationMapper.queryInStockQtys();
+    }
+
 }

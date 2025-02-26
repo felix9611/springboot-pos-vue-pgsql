@@ -12,6 +12,7 @@ import com.fixedasset.service.ProductLocationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,6 +92,12 @@ public class ProductLocationController extends BaseController{
         }
 
         return Result.succ(productLocationService.listAll(queryWrapper));
+    }
+
+    @Operation(summary = "Query in stock list")
+    @GetMapping("/queryInStockQtys")
+    public Result queryInStockQtys() {
+        return Result.succ(productLocationService.queryInStockQtys());
     }
 
 }

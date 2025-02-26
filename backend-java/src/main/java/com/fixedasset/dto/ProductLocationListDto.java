@@ -16,4 +16,6 @@ public class ProductLocationListDto {
     @Transient private String placeName;
 
     @Transient private int qty;
+
+    @Transient private int inStockQtys;
 }
