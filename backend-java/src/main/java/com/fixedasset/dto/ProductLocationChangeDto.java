@@ -24,9 +24,9 @@ public class ProductLocationChangeDto {
     private double cost;
 
     @Schema(description = "Other Qtys")
-    private int otherQty;
+    private double otherQty;
 
-    public int getOtherQty() {
+    public double getOtherQty() {
         return otherQty;
     }
 

@@ -17,4 +17,5 @@ public interface ProductLocationService extends IService<ProductLocation> {
     Page<ProductLocationListDto> newPage(Page page, LambdaQueryWrapper<ProductLocation> queryWrapper);
     List<ProductLocationListDto> listAll(LambdaQueryWrapper<ProductLocation> wrappers);
     void updateData(ProductLocation productLocation);
+    void updateQty(ProductLocation productLocation);
 }
