@@ -18,21 +18,28 @@
                     </el-col>
             </el-form>
         </el-row>
-        <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
+        <div class="lg:col-span-2 shadow-lg rounded-lg bg-white">
             <div class="font-bold p-1">
-                Total Income by Year-Month123
+                Total Income & cost by Year-Month
             </div>
             <div class="p-1">
-                <PlotlyChart v-bind="chartsSetE" />
-                <!--<ChartJs v-bind="chartsSetA" /> -->
+                <PlotlyChart v-bind="chartsSetA" /> 
             </div>
         </div>
-        <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
+        <div class="lg:col-span-2 shadow-lg rounded-lg bg-white">
             <div class="font-bold p-1">
-                Sell Item Total Per Year & Week
+                Difference of between of Income and cost by Year-Month
             </div>
             <div class="p-1">
-                <ChartJs v-bind="chartsSetB" /> 
+                <PlotlyChart v-bind="chartsSetA1" /> 
+            </div>
+        </div>
+        <div class="lg:col-span-2 shadow-lg rounded-lg bg-white">
+            <div class="font-bold p-1">
+                Sell Item Total Per Year & Months
+            </div>
+            <div class="p-1">
+                <PlotlyChart v-bind="chartsSetB" /> 
             </div>
         </div>
         <div class="lg:col-span-1 shadow-lg rounded-lg bg-white">
@@ -134,43 +141,79 @@ export default class Dashboard extends Vue {
 
     get chartsSetA() {
         return {
-            width: 1000,
-            heigh: 90,
-            type: 'line',
-            datasetKey: 'yearWeek',
-            value: 'total',
-            data: this.queryTotalYearWeekList,
-            label: 'Total($)',
-            colors: '#a1d41b'
+            plotyData: [
+                {
+                    name: 'Total Income',
+                    x: this.queryTotalYearWeekList.map((x: any) => x.yearMonth),
+                    y: this.queryTotalYearWeekList.map((x: any) => x.income),
+                    line: {shape: 'spline'},
+                },
+                {
+                    name: 'Total Cost',
+                    x: this.queryTotalYearWeekList.map((x: any) => x.yearMonth),
+                    y: this.queryTotalYearWeekList.map((x: any) => x.costPrice),
+                    line: {shape: 'spline'},
+                }
+            ],
+            plotyLayout: {
+                margin: {
+                    l: 50,
+                    r: 20,
+                    b: 50,
+                    t: 30,
+                    pad: 4
+                },
+                legend: {orientation:"h", xanchor: 'center', x:0.5, y:1 },
+                height: 300
+            }
         }
     }
 
-    get getChartsSetAHeader() {
-        const header: any = []
-        const test = this.queryTotalYearWeekList.map(x=> {  
-            return x.yearMonth
-        })
-        const xu = [ ...new Set(test) ]
-        xu.forEach(r => {
-            header.push({
-              key: 'count',
-              label: r,
-              test: `return row.yearMonth == '${r}'`,
-            })
-        })
-        return header
+    get chartsSetA1() {
+        return {
+            plotyData: [
+                {
+                    name: 'Gap',
+                    x: this.queryTotalYearWeekList.map((x: any) => x.yearMonth),
+                    y: this.queryTotalYearWeekList.map((x: any) => x.difference),
+                    line: {shape: 'spline'},
+                }
+            ],
+            plotyLayout: {
+                margin: {
+                    l: 50,
+                    r: 20,
+                    b: 50,
+                    t: 30,
+                    pad: 4
+                },
+                legend: {orientation:"h", xanchor: 'center', x:0.5, y:1 },
+                height: 300
+            }
+        }
     }
 
     get chartsSetB() {
         return {
-            width: 1000,
-            heigh: 90,
-            type: 'line',
-            datasetKey: 'yearWeek',
-            value: 'count',
-            data: this.queryCountYearWeekList,
-            label: 'Total Items',
-            colors: '#a1d41b'
+            plotyData: [
+                {
+                    name: 'Counts',
+                    x: this.queryCountYearWeekList.map((x: any) => x.yearMonth),
+                    y: this.queryCountYearWeekList.map((x: any) => x.count),
+                    line: {shape: 'spline'},
+                }
+            ],
+            plotyLayout: {
+                margin: {
+                    l: 50,
+                    r: 20,
+                    b: 50,
+                    t: 30,
+                    pad: 4
+                },
+                legend: {orientation:"h", xanchor: 'center', x:0.5, y:1 },
+                height: 300
+            }
         }
     }
 
@@ -203,7 +246,7 @@ export default class Dashboard extends Vue {
                 margin: {
                     l: 50,
                     r: 50,
-                    b: 70,
+                    b: 100,
                     t: 30,
                     pad: 4
                 },
@@ -230,7 +273,7 @@ export default class Dashboard extends Vue {
                 margin: {
                     l: 50,
                     r: 50,
-                    b: 30,
+                    b: 100,
                     t: 30,
                     pad: 4
                 },
@@ -363,7 +406,7 @@ export default class Dashboard extends Vue {
                 margin: {
                     l: 50,
                     r: 50,
-                    b: 30,
+                    b: 100,
                     t: 30,
                     pad: 4
                 },

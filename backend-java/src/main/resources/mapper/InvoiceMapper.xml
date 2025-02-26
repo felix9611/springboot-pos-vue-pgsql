@@ -7,14 +7,6 @@
                 (#{number}, #{memberId}, #{discount}, #{totalAmount}, #{locationId}, #{voidNum}, #{createdAt})
     </insert>
 
-    <select id="queryCountYearWeek" resultType="com.fixedasset.dto.charts.QueryCountYearWeek">
-        SELECT 
-            concat(date_part('YEAR', created_at), '-', date_part('WEEK', created_at)) as yearWeek, 
-            count(*) as count 
-        FROM invoice ${ew.customSqlSegment}  
-        GROUP BY concat(date_part('YEAR', created_at), '-', date_part('WEEK', created_at)) ;
-    </select>
-
     <select id="queryCountShop" resultType="com.fixedasset.dto.charts.QueryCountShop">
         SELECT loc.place_name as placeName,  count(inv.id) as count 
         FROM invoice as inv 
@@ -123,25 +115,25 @@
         LIMIT 10;
     </select>
 
-    <select id="listAll" resultType="com.fixedasset.dto.InvoiceListDto">
-        SELECT * from ( SELECT inv.*, 
-            m.name as memberName, m.phone as memberPhone, m.address as memberAddress, 
-            mc.name as mcName , loc.place_code as placeCode, loc.place_name as placeName,
-            loc.address as address, loc.zip_code as zipCode, loc.country as country
-             FROM invoice as inv 
-            left join member as m on inv.member_id = m.id 
-            left join member_class as mc on m.class  = mc.id 
-            left join location as loc on inv.location_id = loc.id ) AS q ${ew.customSqlSegment}
-    </select>
-
     <select id="queryTotalYearWeek" resultType="com.fixedasset.dto.charts.QueryTotalYearWeek">
-        SELECT concat(year(created_at), '-', week(created_at)) AS yearWeek, 
+        SELECT concat(date_part('year', inv.created_at), '-',TO_CHAR(inv.created_at, 'Month')) AS yearMonth, 
         sum(total_amount) AS income,
         sum(cost_price * iitem.qty) AS costPrice,
         (sum(total_amount) - sum(cost_price * iitem.qty)) AS difference 
-        FROM pos_springboot_vue_3.invoice_item AS iitem ${ew.customSqlSegment}
+        FROM invoice_item AS iitem ${ew.customSqlSegment}
         LEFT JOIN invoice AS inv ON inv.id = iitem.invoice_id
         LEFT JOIN product_list AS pl ON pl.id = iitem.product_id 
-        GROUP BY concat(year(created_at), '-', week(created_at));
+        GROUP BY concat(date_part('year', inv.created_at), '-',TO_CHAR(inv.created_at, 'Month')) 
+		ORDER BY concat(date_part('year', inv.created_at), '-', TO_CHAR(inv.created_at, 'Month'));
+    </select>
+
+    <select id="queryCountYearWeek" resultType="com.fixedasset.dto.charts.QueryCountYearWeek">
+        SELECT 
+            concat(date_part('year', invoice.created_at), '-',  TO_CHAR(invoice.created_at, 'Month')) AS yearMonth,
+            sum(ii.qty) as count 
+        FROM invoice 
+        LEFT JOIN invoice_item as ii on invoice.id  = ii.invoice_id  ${ew.customSqlSegment} 
+        GROUP BY concat(date_part('year', invoice.created_at), '-', TO_CHAR(invoice.created_at, 'Month')) 
+		ORDER BY concat(date_part('year', invoice.created_at), '-', TO_CHAR(invoice.created_at, 'Month'));
     </select>
 </mapper>
