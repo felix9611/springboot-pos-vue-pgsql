@@ -18,11 +18,11 @@ public class BaseEntity implements Serializable {
     private Long id;
 
     @Schema(description = "Created date time,Only apply for response")
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    // @JsonFormat(pattern="yyyy-MM-ddTHH:mm:ss")
     private OffsetDateTime created;
 
     @Schema(description = "Updated date time, Only apply for response")
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    // @JsonFormat(pattern="yyyy-MM-ddTHH:mm:ss")
     private OffsetDateTime updated;
 
     @Schema(description = "Active status, 1 = Active, 0 = Void, Only apply for response")

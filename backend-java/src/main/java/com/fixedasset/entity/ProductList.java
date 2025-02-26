@@ -41,6 +41,10 @@ public class ProductList extends BaseEntity {
     @TableField("description")
     private String description;
 
+    @Schema(description = "Product Cost Price from Vendor")
+    @TableField("cost_price")
+    private Double costPrice;
+
     @Schema(description = "Product Retail Price")
     @TableField("retail_price")
     private Double retailPrice;

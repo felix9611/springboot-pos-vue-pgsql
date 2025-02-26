@@ -8,6 +8,8 @@ import javax.persistence.Transient;
 @EqualsAndHashCode()
 @Data
 public class QueryTotalYearWeek {
-    @Transient private String yearWeek;
-    @Transient private int total;
+    @Transient private String yearMonth;
+    @Transient private int income;
+    @Transient private double costPrice;
+    @Transient private double difference;
 }

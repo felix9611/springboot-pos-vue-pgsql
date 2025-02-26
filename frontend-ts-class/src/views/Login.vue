@@ -48,10 +48,10 @@
                         <div class="grid grid-cols-2 gap-5 py-5">
                             <button
                                 @click.prevent="submitForm('loginForm')"
-                                class="p-3 bg-[#b5b5b5] bg-opacity-30 hover:bg-opacity-100 rounded-lg text-blue-800 font-bold"
+                                class="p-3 bg-[#b5b5b5] bg-opacity-50 hover:bg-opacity-100 rounded-lg text-blue-800 font-bold"
                             >Login</button>
                             <button
-                                class="p-3 bg-[#b5b5b5]  bg-opacity-30 hover:bg-opacity-100 rounded-lg text-blue-800 font-bold"
+                                class="p-3 bg-[#b5b5b5] bg-opacity-50 hover:bg-opacity-100 rounded-lg text-blue-800 font-bold"
                                 @click.prevent="resetForm('loginForm')"
                             >Reset</button>
                         </div>

@@ -8,6 +8,6 @@ import javax.persistence.Transient;
 @EqualsAndHashCode()
 @Data
 public class QueryCountYearWeek {
-    @Transient private String yearWeek;
+    @Transient private String yearMonth;
     @Transient private int count;
 }

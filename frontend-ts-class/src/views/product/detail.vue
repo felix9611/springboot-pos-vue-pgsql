@@ -58,6 +58,9 @@
       <el-form-item label="Unit"  prop="unit" label-width="120px">
         <el-input v-model="editForm.unit" autocomplete="off"></el-input>
       </el-form-item>
+      <el-form-item label="Cost Price from Vendor"  prop="costPrice" label-width="160px">
+        <el-input-number v-model="editForm.costPrice" :step="0.01" :precision="2" class="w-full"></el-input-number>
+      </el-form-item>
       <el-form-item label="Retail Price"  prop="retailPrice" label-width="120px">
         <el-input-number v-model="editForm.retailPrice" :step="0.01" :precision="2" class="w-full"></el-input-number>
       </el-form-item>

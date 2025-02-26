@@ -64,9 +64,9 @@ public class ProductLocationServiceImpl extends ServiceImpl<ProductLocationMappe
         
         ProductLocation oldRecord = productLocationMapper.selectOne(queryWrapper);
 
-        double newTotalPrice = oldRecord.getTotalPrice() - productLocation.getTotalPrice();
+      //  double newTotalPrice = oldRecord.getTotalPrice() - productLocation.getTotalPrice();
 
-        productLocationMapper.updatePlaceQty(productLocation.getQty(), newTotalPrice,  productLocation.getProductId(), productLocation.getLocationId());
+        productLocationMapper.updatePlaceQty(productLocation.getQty(), oldRecord.getTotalPrice(),  productLocation.getProductId(), productLocation.getLocationId());
 
         invRecord.setQty(productLocation.getOtherQty());
         invRecord.setProductId(productLocation.getProductId());

@@ -135,6 +135,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         SysMenu checkOne = this.getOne(queryWrapper);
 
         if (checkOne == null) {
+            if (sysMenu.getParentId() == null) {
+                sysMenu.setParentId(0L);
+            }
+
             sysMenu.setCreated(OffsetDateTime.now());
             sysMenu.setStatu(1);
 
@@ -166,8 +170,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         queryWrapper.eq(SysMenu::getStatu, 1);
         SysMenu checkOne = this.getOne(queryWrapper);
 
-        if (checkOne.getId().equals(sysMenu.getId())) {
-            sysMenu.setUpdated(OffsetDateTime.now());
+        if (checkOne != null) {
+            // sysMenu.setUpdated(OffsetDateTime.now());
             sysMenuMapper.updateById(sysMenu);
 
             actionRecordService.createdAction(

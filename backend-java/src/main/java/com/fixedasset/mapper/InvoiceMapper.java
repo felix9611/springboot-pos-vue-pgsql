@@ -29,23 +29,15 @@ public interface InvoiceMapper extends BaseMapper<Invoice> {
 
     String selectOne = listQuery + " where inv.id = ${id}";
 
-    String queryTotalYearWeek = "SELECT CONCAT(date_part('YEAR', created_at), '-', date_part('MONTH', created_at)) as yearWeek, sum(total_amount) as total FROM invoice ${ew.customSqlSegment} group by CONCAT(date_part('YEAR', created_at), '-', date_part('MONTH', created_at));";
-    // String wrapperSqlTotalYearWeek = "SELECT * from ( " + queryTotalYearWeek + " q ${ew.customSqlSegment}";
-    @Select(queryTotalYearWeek)
     List<QueryTotalYearWeek> queryTotalYearWeek(@Param("ew") Wrapper<Invoice> queryWrapper);
 
-    String queryCountYearWeek = "SELECT CONCAT(date_part('YEAR', created_at), '-', date_part('MONTH', created_at)) as yearWeek, count(*) as count FROM invoice ${ew.customSqlSegment} group by CONCAT(date_part('YEAR', created_at), '-', date_part('MONTH', created_at));";
-    @Select(queryCountYearWeek)
     List<QueryCountYearWeek> queryCountYearWeek(@Param("ew") Wrapper<Invoice> queryWrapper);
 
-    String queryTotalShop = "SELECT loc.place_name as placeName, sum(total_amount) as total " +
-            "FROM invoice as inv left join location as loc on inv.location_id = loc.id  group by loc.place_name;";
-   // @Select(queryTotalShop)
     List<QueryTotalShop> queryTotalShop();
 
     List<QueryCountShop> queryCountShop();
 
-  //  @Select(wrapperSql)
+    @Select(wrapperSql)
     Page<InvoiceListDto> listAll(Page page, @Param("ew") Wrapper<Invoice> queryWrapper);
 
     @Select(selectOne)
