@@ -146,7 +146,7 @@ export default class StockIn extends Vue {
               console.log(renewQty)
               axios.post('/product/location/stock/out', {
                 productId: rs.productId,
-                oldPlace: rs.placeId,
+                locationId: rs.placeId,
                 qty: renewQty,
                 totalPrice: rs.cost,
                 otherQty: rs.qty
