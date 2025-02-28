@@ -7,9 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fixedasset.dto.ProductListDto;
 import com.fixedasset.dto.ProductListUploadDto;
-import com.fixedasset.dto.ProductLocationListDto;
 import com.fixedasset.dto.ProductLocationUploadDto;
-import com.fixedasset.entity.ActionRecord;
 import com.fixedasset.entity.Department;
 import com.fixedasset.entity.InvRecord;
 import com.fixedasset.entity.Location;
@@ -18,7 +16,6 @@ import com.fixedasset.entity.ProductListFile;
 import com.fixedasset.entity.ProductLocation;
 import com.fixedasset.entity.ProductType;
 import com.fixedasset.entity.Vendor;
-import com.fixedasset.mapper.ActionRecordMapper;
 import com.fixedasset.mapper.ProductListMapper;
 import com.fixedasset.mapper.ProductLocationMapper;
 import com.fixedasset.service.ActionRecordService;
@@ -31,7 +28,6 @@ import com.fixedasset.service.ProductLocationService;
 import com.fixedasset.service.ProductTypeService;
 import com.fixedasset.service.VendorService;
 
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.OffsetDateTime;
@@ -437,6 +433,7 @@ public class ProductListServiceImpl extends ServiceImpl<ProductListMapper, Produ
         return one;
     }
 
+    @SuppressWarnings("unused")
     public ProductList findOneById(Long id) {
         LambdaQueryWrapper<ProductList> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(ProductList::getId, id);
@@ -447,7 +444,11 @@ public class ProductListServiceImpl extends ServiceImpl<ProductListMapper, Produ
         List<ProductListFile> files = productListFileService.getByAssetId(productListFile);
         one.setProductListFiles(files);
 
-        return one;
+        if (one == null) {
+            throw new RuntimeException("No this product in the system!");
+        } else {
+            return one;
+        }
     }
 
     public Page<ProductListDto> newPage(Page page, LambdaQueryWrapper<ProductList> queryWrapper) {
