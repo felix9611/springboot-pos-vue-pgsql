@@ -430,7 +430,11 @@ public class ProductListServiceImpl extends ServiceImpl<ProductListMapper, Produ
         queryWrapper.eq(ProductList::getProductCode, productList.getProductCode());
         queryWrapper.eq(ProductList::getStatu, 1);
         ProductList one = productListMapper.selectOne(queryWrapper);
-        return one;
+        if (one == null) {
+            throw new RuntimeException("No this product in the system!");
+        } else {
+            return one;
+        }
     }
 
     @SuppressWarnings("unused")
