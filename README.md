@@ -1,5 +1,6 @@
 <h1>POS System</h1>
 <p><strong>Spring Boot & Vue.js | Cloud-based POS System</strong></p>
+<p>NCPL（Non-Commercial Public License）</p>
 
 <h2>🌟 Project Overview</h2>
 <p>This is a full-stack <strong>POS (Point of Sale) System</strong> built with <strong>Spring Boot</strong> and <strong>Vue.js</strong>. It is designed for businesses to manage purchase orders, transactions, inventory, and product records.</p>
